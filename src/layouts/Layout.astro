@@ -1,4 +1,8 @@
 ---
+// Fonts are self-hosted (bundled from npm), so visitors' IPs never reach Google.
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '@fontsource-variable/inter';
 import '../styles/global.css';
 
 interface Props {
@@ -38,12 +42,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://www.nuvella
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
-    />
   </head>
   <body>
     <slot />

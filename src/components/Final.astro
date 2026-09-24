@@ -28,6 +28,10 @@ import Logo from './Logo.astro';
     </div>
     <div class="final__cta-col">
       <a class="cta cta--primary final__cta" href={WHATSAPP_DEMO_URL} target="_blank" rel="noopener">[ AGENDA UNA DEMO → ]</a>
+      <p class="final__legal">
+        Al escribirnos por WhatsApp tratamos tu número y tus mensajes solo para atender tu solicitud.{' '}
+        <a href={PRIVACY_POLICY_URL}>Política de datos</a>
+      </p>
     </div>
   </div>
 
@@ -106,12 +110,26 @@ import Logo from './Logo.astro';
     grid-column: 7 / span 6;
     padding: 0 12px;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 16px;
   }
   .final__cta {
     font-size: clamp(16px, 1.5vw, 22px);
     padding: 28px 34px;
+  }
+  .final__legal {
+    margin: 0;
+    max-width: 380px;
+    text-align: right;
+    font: 13px/1.5 var(--font-body);
+    color: var(--muted);
+  }
+  .final__legal a {
+    color: var(--fg);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .footer {
@@ -155,7 +173,11 @@ import Logo from './Logo.astro';
       grid-column: 1 / -1;
     }
     .final__cta-col {
-      justify-content: stretch;
+      align-items: stretch;
+    }
+    .final__legal {
+      max-width: none;
+      text-align: left;
     }
     .final__cta {
       width: 100%;

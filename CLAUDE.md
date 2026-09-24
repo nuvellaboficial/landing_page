@@ -76,7 +76,10 @@ Cuando dos skills se contradigan, ganan las decisiones explícitas del usuario y
 
 ## Política de tratamiento de datos
 
-Vive en `/politica-de-tratamiento-de-datos` (`src/pages/politica-de-tratamiento-de-datos.astro`) y **esta es la única versión vigente**. El texto está en `src/components/legal/PrivacyPolicy.astro`, portado literal de la v1.0 que se publicaba antes en GitHub Pages. Ese repo y esa URL se eliminaron el 2026-09-24, y Meta ya apunta a esta URL: este archivo es la única copia de la política. Es texto legal: no se edita sin revisión del usuario.
+Vive en `/politica-de-tratamiento-de-datos` (`src/pages/politica-de-tratamiento-de-datos.astro`), con el atajo `/privacidad` (redirect en `astro.config.mjs`, lo usan el aviso del bot y el dashboard), y **esta es la única versión vigente**. El texto está en `src/components/legal/PrivacyPolicy.astro`. La v1.0 se portó de GitHub Pages (ese repo y esa URL se eliminaron el 2026-09-24, y Meta ya apunta a esta URL). La v1.1 (2026-09-24) la alineó con lo que el sistema guarda de verdad: proveedores reales (Supabase, Hostinger, Vercel, Google Gemini, Anthropic, Meta, Resend; Chatwoot autoalojado), plazos de retención del cron y el flujo de consentimiento. Es texto legal: no se edita sin revisión del usuario, y cualquier cambio de proveedor, de dato guardado o de plazo de retención en el backend exige actualizarla (subir la versión y la fecha, y la versión que acepta el dashboard).
+
+- **Datos del responsable:** se publica solo lo que exige el Decreto 1377 (nombre, domicilio, dirección, correo y teléfono). La cédula no se publica. La dirección es la de la casa del usuario de forma provisional, hasta que tenga una oficina virtual o un casillero; no se repite en ningún otro lugar.
+- **Sin terceros en el navegador:** las fuentes vienen de `@fontsource-variable/*` (empaquetadas en el build), no de Google Fonts. La política declara que el sitio no carga recursos de terceros, ni cookies, ni analítica: agregar cualquiera de esas cosas exige cambiar la política antes.
 
 ## Código
 
