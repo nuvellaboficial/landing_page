@@ -76,7 +76,7 @@ Cuando dos skills se contradigan, ganan las decisiones explícitas del usuario y
 
 ## Política de tratamiento de datos
 
-Vive en `/politica-de-tratamiento-de-datos` (`src/pages/politica-de-tratamiento-de-datos.astro`); el texto está en `src/components/legal/PrivacyPolicy.astro`, portado literal de la versión publicada en GitHub Pages (repo `politicas-nuvel_lab`, carpeta `../tratamiento_de_datos/`, cuyo `index.html` es la versión completa; el `.md` de esa carpeta es un borrador viejo con campos vacíos). Es texto legal: no se edita sin revisión del usuario.
+Vive en `/politica-de-tratamiento-de-datos` (`src/pages/politica-de-tratamiento-de-datos.astro`) y **esta es la única versión vigente**. El texto está en `src/components/legal/PrivacyPolicy.astro`, portado literal de la v1.0 que se publicaba en GitHub Pages (repo `politicas-nuvel_lab`). Desde el 2026-09-24 ese repo solo redirige la URL antigua (`nuvellaboficial.github.io/politicas-nuvel_lab/`) a la nueva; el original queda en su historial de git. Es texto legal: no se edita sin revisión del usuario.
 
 ## Código
 
