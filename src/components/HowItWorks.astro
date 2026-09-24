@@ -1,0 +1,209 @@
+---
+import { HOW_NICHE, HOW_SCRIPT, HOW_STEPS } from '../lib/data';
+import { agendaHtml, agendaLayout } from '../lib/templates';
+import { formatHour } from '../lib/util';
+import ChatScreen from './frames/ChatScreen.astro';
+import DashShell from './frames/DashShell.astro';
+import LaptopFrame from './frames/LaptopFrame.astro';
+import PhoneFrame from './frames/PhoneFrame.astro';
+
+const agenda = agendaLayout(HOW_NICHE);
+---
+
+<section id="como-funciona" class="pinned how" style="--track:320vh;--track-mobile:300vh" data-how>
+  <div class="pinned__stage">
+    <h2 class="section-title how__title">Así se agenda una cita sin que toques el celular.</h2>
+
+    <ol class="how__steps">
+      {
+        HOW_STEPS.map(([title, text], i) => (
+          <li class:list={['how__step', { 'is-active': i === HOW_STEPS.length - 1 }]} data-step>
+            <span class="how__num">{i + 1}</span>
+            <div>
+              <div class="how__step-title">{title}</div>
+              <div class="how__step-text">{text}</div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="how__devices" aria-hidden="true">
+      <PhoneFrame scale="var(--k3)" data-focus="how">
+        <ChatScreen id="how" clock="11:48" biz={HOW_NICHE.biz} bizInitials={HOW_NICHE.bizInitials} script={HOW_SCRIPT} />
+      </PhoneFrame>
+
+      <LaptopFrame width="var(--lap3-w)" scale="var(--lap3-scale)" class="how__laptop" data-focus="how">
+        <DashShell active="Citas" full={false}>
+          <div class="dash__main">
+            <div class="dash__title">Citas</div>
+            <div class="dash-toolbar">
+              <div class="seg"><span class="is-on">Día</span><span>Semana</span></div>
+              <span class="muted">{agenda.date}</span>
+            </div>
+            <div class="how__agenda" set:html={agendaHtml(agenda, { targetClass: 'appt-landing is-landed' })} />
+          </div>
+        </DashShell>
+      </LaptopFrame>
+
+      <div class="how__mini mini-agenda" data-focus="how">
+        <div class="mini-agenda__head">
+          <div class="avatar">CO</div>
+          <div class="mini-agenda__worker">Camila Ortiz</div>
+        </div>
+        <div class="how__mini-date">Sábado, 26 sep</div>
+        <div class="mini-agenda__grid">
+          {
+            [-1, 0, 1].map((o, i) => (
+              <div class="mini-agenda__row" style={`top:${i * 40 + 12}px`}>
+                {formatHour(14 + o)}
+              </div>
+            ))
+          }
+          <div class="mini-agenda__appt appt-landing is-landed how__mini-appt">
+            <div class="cal__name">Daniela Muñoz</div>
+            <div>Masaje relajante</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="how__token" data-how-token aria-hidden="true">Daniela · Sáb 2:00 p. m.</div>
+  </div>
+</section>
+
+<style>
+  .pinned__stage {
+    row-gap: 40px;
+  }
+  .how__title {
+    grid-column: 1 / span 8;
+  }
+  .how__steps {
+    grid-column: 1 / span 4;
+    grid-row: 2;
+    align-self: center;
+    list-style: none;
+    margin: 0;
+    padding: 0 16px 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+  .how__step {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 8px;
+  }
+  .how__num {
+    font: 500 16px/1.3 var(--font-display);
+    color: var(--dim);
+    transition: color 0.2s;
+  }
+  .how__step-title {
+    font: 500 22px/1.25 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--dim);
+    transition: color 0.2s;
+  }
+  .how__step-text {
+    font: 15px/1.5 var(--font-body);
+    color: var(--dim);
+    margin-top: 4px;
+  }
+  .how__step.is-active .how__num {
+    color: var(--accent);
+  }
+  .how__step.is-active .how__step-title {
+    color: var(--fg);
+  }
+  .how__step.is-active .how__step-text {
+    color: var(--muted);
+  }
+  .how__devices {
+    grid-column: 5 / span 8;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 0 12px;
+  }
+  .how__agenda {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+  .how__agenda :global(.appt-landing.is-landed) {
+    box-shadow:
+      0 0 0 1px var(--accent),
+      0 0 24px rgba(255, 153, 51, 0.45);
+  }
+  .how__mini {
+    display: none;
+  }
+  .how__mini-date {
+    font: 10px var(--font-body);
+    color: var(--muted);
+    padding: 6px 0 2px;
+  }
+  .how__mini-appt {
+    top: 52px;
+  }
+  .how__mini-appt.is-landed {
+    box-shadow:
+      0 0 0 1px var(--accent),
+      0 0 24px rgba(255, 153, 51, 0.45);
+  }
+  .how__token {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--accent-fill);
+    color: #fff;
+    font: 600 12px/1 var(--font-body);
+    padding: 9px 12px;
+    border-radius: 8px;
+    box-shadow:
+      0 0 0 1px var(--accent),
+      0 0 30px rgba(255, 153, 51, 0.6);
+    white-space: nowrap;
+    will-change: transform;
+  }
+
+  @media (max-width: 819.98px) {
+    .pinned__stage {
+      row-gap: 18px;
+    }
+    .how__title {
+      grid-column: 1 / -1;
+    }
+    .how__steps {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      gap: 10px;
+    }
+    .how__step-title {
+      font-size: 17px;
+    }
+    .how__step:not(.is-active) .how__step-text {
+      display: none;
+    }
+    .how__devices {
+      grid-column: 1 / -1;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .how__laptop {
+      display: none;
+    }
+    .how__mini {
+      display: block;
+      flex: 1;
+      min-width: 0;
+    }
+  }
+</style>

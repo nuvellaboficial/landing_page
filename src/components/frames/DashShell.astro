@@ -1,0 +1,41 @@
+---
+/** Chrome of the simulated dashboard: top bar, sidebar and a main slot. */
+import { DASH_NAV } from '../../lib/data';
+
+interface Props {
+  active: string;
+  /** Top bar icons and bot status card (hidden in the compact variant). */
+  full?: boolean;
+}
+
+const { active, full = true } = Astro.props;
+---
+
+<div class="dash" aria-hidden="true">
+  <div class="dash__top">
+    {
+      full && (
+        <>
+          <span class="dash__icon" />
+          <span class="dash__icon" />
+          <span class="dash__user">S</span>
+        </>
+      )
+    }
+  </div>
+  <div class="dash__body">
+    <div class="dash__side">
+      <div class="dash__brand">NuvelLab</div>
+      <div class="dash__caption">PORTAL DE GESTIÓN</div>
+      {
+        DASH_NAV.map((label) => (
+          <div class:list={['dash__nav-item', { 'is-active': label === active }]} data-nav-item={label}>
+            {label}
+          </div>
+        ))
+      }
+      {full && <div class="dash__bot">Estado del Bot<b>Activo</b></div>}
+    </div>
+    <slot />
+  </div>
+</div>

@@ -1,0 +1,190 @@
+---
+import { APP_URL, NAV_LINKS, WHATSAPP_DEMO_URL } from '../lib/data';
+import Logo from './Logo.astro';
+---
+
+<header class="nav" data-nav>
+  <a href="#top" aria-label="NuvelLab, inicio"><Logo size={21} /></a>
+  <nav class="nav__links nav-label" aria-label="Secciones">
+    {
+      NAV_LINKS.map((l) => (
+        <a href={l.href} data-section-link>
+          {l.label}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="nav__actions">
+    <a class="nav-label" href={APP_URL}>INGRESAR</a>
+    <a class="cta cta--primary nav__demo" href={WHATSAPP_DEMO_URL} target="_blank" rel="noopener">[ AGENDA UNA DEMO ]</a>
+  </div>
+  <button class="nav__toggle cta cta--ghost" type="button" aria-expanded="false" aria-controls="menu" data-menu-open>
+    [ MENÚ ]
+  </button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menú" hidden data-menu>
+  <div class="menu__top">
+    <Logo size={21} />
+    <button class="cta cta--ghost menu__close" type="button" data-menu-close>[ CERRAR ]</button>
+  </div>
+  <nav class="menu__links" aria-label="Secciones">
+    {
+      NAV_LINKS.map((l) => (
+        <a href={l.href} data-menu-link data-section-link>
+          {l.label}
+        </a>
+      ))
+    }
+    <a href={APP_URL} class="muted">INGRESAR</a>
+  </nav>
+  <a class="cta cta--primary menu__demo" href={WHATSAPP_DEMO_URL} target="_blank" rel="noopener">[ AGENDA UNA DEMO → ]</a>
+</div>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 24px;
+    border-bottom: 1px solid transparent;
+    transition:
+      height 0.25s ease,
+      background 0.25s ease,
+      border-color 0.25s ease;
+  }
+  .nav.is-compact {
+    height: 60px;
+    background: rgba(10, 10, 10, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom-color: var(--line);
+  }
+  .nav__links {
+    display: flex;
+    gap: 28px;
+    white-space: nowrap;
+  }
+  .nav__links a {
+    position: relative;
+    color: var(--muted);
+  }
+  .nav__links a:hover {
+    color: var(--fg);
+  }
+
+  /* Current section: the link lights up between orange brackets, Spur-style.
+     The brackets are absolutely positioned so the row never shifts. */
+  [data-section-link][aria-current='true'] {
+    color: var(--fg);
+  }
+  .nav__links [data-section-link]::before,
+  .nav__links [data-section-link]::after {
+    position: absolute;
+    top: 0;
+    color: var(--accent);
+    opacity: 0;
+    transition:
+      opacity 0.2s ease,
+      transform 0.25s var(--ease-out);
+  }
+  .nav__links [data-section-link]::before {
+    content: '[';
+    right: calc(100% + 6px);
+    transform: translateX(4px);
+  }
+  .nav__links [data-section-link]::after {
+    content: ']';
+    left: calc(100% + 6px);
+    transform: translateX(-4px);
+  }
+  .nav__links [data-section-link][aria-current='true']::before,
+  .nav__links [data-section-link][aria-current='true']::after {
+    opacity: 1;
+    transform: none;
+  }
+  .menu__links [data-section-link][aria-current='true'] {
+    color: var(--accent);
+  }
+  .nav__actions {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+  .nav__demo {
+    font-size: 12px;
+    padding: 13px 16px;
+  }
+  .nav__toggle,
+  .menu__close {
+    font-size: 12px;
+    padding: 13px 14px;
+    letter-spacing: 0.14em;
+    background: none;
+    cursor: pointer;
+  }
+  .nav__toggle {
+    display: none;
+  }
+
+  @media (max-width: 1179.98px) {
+    .nav__links,
+    .nav__actions {
+      display: none;
+    }
+    .nav__toggle {
+      display: inline-flex;
+    }
+  }
+  @media (max-width: 819.98px) {
+    .nav {
+      height: 64px;
+      padding: 0 16px;
+    }
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px 28px;
+    gap: 28px;
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu__links {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+  }
+  .menu__links a {
+    font: 400 28px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .menu__links a:last-child {
+    border-bottom: none;
+  }
+  .menu__demo {
+    font-size: 14px;
+    padding: 20px;
+  }
+</style>

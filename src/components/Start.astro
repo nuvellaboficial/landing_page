@@ -1,0 +1,127 @@
+---
+import { START_STEPS } from '../lib/data';
+---
+
+<section class="start" data-start>
+  <div class="page-grid start__grid">
+    <h2 class="section-title start__title">De la demo a tu bot en vivo.</h2>
+    <ol class="start__track">
+      <li class="start__line" aria-hidden="true" data-focus="start"><span class="start__fill" data-start-fill></span></li>
+      {
+        START_STEPS.map(([title, desc], i) => (
+          <li class="start__step is-on" data-start-step>
+            <span class="start__dot" aria-hidden="true" />
+            <span class="start__num">{i + 1}</span>
+            <span class="start__step-title">{title}</span>
+            <span class="start__desc">{desc}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .start {
+    position: relative;
+    z-index: 2;
+    padding: clamp(110px, 12vw, 190px) 0 0;
+  }
+  .start__grid {
+    row-gap: 56px;
+  }
+  .start__title {
+    grid-column: 1 / span 6;
+  }
+  .start__track {
+    grid-column: 1 / -1;
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .start__line {
+    position: absolute;
+    left: 12px;
+    top: 0;
+    width: calc(100% - 24px);
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .start__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform-origin: 0 0;
+  }
+  .start__step {
+    grid-column: span 4;
+    position: relative;
+    padding: 36px 24px 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .start__dot {
+    position: absolute;
+    left: 7px;
+    top: -5px;
+    width: 11px;
+    height: 11px;
+    box-sizing: border-box;
+    background: var(--bg);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: background 0.2s ease;
+  }
+  .start__num {
+    font: 500 15px/1 var(--font-display);
+    color: var(--dim);
+    transition: color 0.2s;
+  }
+  .start__step-title {
+    font: 400 28px/1.1 var(--font-display);
+    letter-spacing: -0.03em;
+    color: var(--dim);
+    transition: color 0.2s;
+  }
+  .start__desc {
+    font: 16px/1.55 var(--font-body);
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .is-on .start__dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(255, 153, 51, 0.6);
+  }
+  .is-on .start__num {
+    color: var(--accent);
+  }
+  .is-on .start__step-title {
+    color: var(--fg);
+  }
+
+  @media (max-width: 819.98px) {
+    .start__title {
+      grid-column: 1 / -1;
+    }
+    .start__track {
+      grid-template-columns: 1fr;
+    }
+    .start__line {
+      left: 17px;
+      width: 1px;
+      height: 100%;
+    }
+    .start__step {
+      grid-column: 1 / -1;
+      padding: 0 16px 44px 48px;
+    }
+    .start__dot {
+      left: 12px;
+      top: 2px;
+    }
+  }
+</style>

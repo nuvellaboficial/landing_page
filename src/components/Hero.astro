@@ -1,0 +1,229 @@
+---
+import { NICHES, WHATSAPP_DEMO_URL } from '../lib/data';
+import { agendaHtml, agendaLayout, miniAgendaHtml, nicheScript } from '../lib/templates';
+import ChatScreen from './frames/ChatScreen.astro';
+import DashShell from './frames/DashShell.astro';
+import HeadlineMask from './HeadlineMask.astro';
+import LaptopFrame from './frames/LaptopFrame.astro';
+import PhoneFrame from './frames/PhoneFrame.astro';
+
+// Server render the final frame (appointment landed); scripts replay it.
+const niche = NICHES[0];
+const agenda = agendaLayout(niche);
+---
+
+<section id="top" class="hero" data-hero>
+  <HeadlineMask tag="h1" dataAttr="data-hero-word" />
+
+  <div class="hero__intro page-grid" data-hero-intro>
+    <div class="hero__copy">
+      <p class="lede">
+        NuvelLab contesta el WhatsApp de tu negocio, agenda con tu disponibilidad real y te deja todo listo en tu panel.
+      </p>
+      <div class="hero__ctas">
+        <a class="cta cta--primary" href={WHATSAPP_DEMO_URL} target="_blank" rel="noopener">[ AGENDA UNA DEMO → ]</a>
+        <a class="cta cta--ghost" href="#como-funciona">[ CÓMO FUNCIONA ↓ ]</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__stage" aria-hidden="true">
+    <div class="hero__rig" data-hero-rig>
+      <div class="hero__laptop">
+        <LaptopFrame width="600px" scale=".6614" data-hero-laptop data-focus="hero">
+          <div class="hero__screen" data-hero-screen>
+            <DashShell active="Citas">
+              <div class="dash__main">
+                <div class="dash__row">
+                  <div class="dash__title">Citas</div>
+                  <div class="hero__btns">
+                    <div class="dash-btn">Cita recurrente</div>
+                    <div class="dash-btn dash-btn--primary">+ Nueva cita</div>
+                  </div>
+                </div>
+                <div class="hero__tabs"><div class="is-on">Agenda</div><div>Recurrentes</div></div>
+                <div class="dash-toolbar">
+                  <div class="seg"><span class="is-on">Día</span><span>Semana</span></div>
+                  <span class="muted" data-hero-date>{agenda.date}</span>
+                  <span class="hero__spacer"></span>
+                  <div class="seg"><span>Lista</span><span class="is-on">Calendario</span></div>
+                </div>
+                <div
+                  class="hero__agenda"
+                  data-hero-agenda
+                  set:html={agendaHtml(agenda, { columnLines: true, targetClass: 'appt-landing is-landed' })}
+                />
+              </div>
+            </DashShell>
+          </div>
+        </LaptopFrame>
+      </div>
+
+      <div class="hero__phone">
+        <PhoneFrame scale=".8" screenClass="hero__screen" data-hero-phone data-focus="hero">
+          <ChatScreen id="hero" biz={niche.biz} bizInitials={niche.bizInitials} script={nicheScript(niche)} />
+        </PhoneFrame>
+      </div>
+
+      <div
+        class="hero__mini mini-agenda hero__screen"
+        data-hero-mini
+        data-focus="hero"
+        set:html={miniAgendaHtml(niche, 'appt-landing is-landed')}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    z-index: 2;
+    min-height: max(100vh, 680px);
+    padding: 100px 0 0;
+    box-sizing: border-box;
+  }
+  .hero__intro {
+    margin-top: 4vh;
+    position: relative;
+    z-index: 3;
+    transition:
+      opacity 0.7s ease,
+      transform 0.8s var(--ease-out);
+  }
+  :global(html.motion) .hero__intro:not(.is-in) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .hero__copy {
+    grid-column: 1 / span 4;
+    padding: 0 16px 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hero__stage {
+    position: absolute;
+    right: calc(var(--cell) * 0.5);
+    bottom: 4vh;
+    width: 780px;
+    height: 500px;
+    transform: scale(var(--dev-scale));
+    transform-origin: 100% 100%;
+    perspective: 1800px;
+    z-index: 2;
+  }
+  .hero__rig {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .hero__laptop {
+    position: absolute;
+    left: 0;
+    top: 60px;
+    width: 600px;
+    transform: rotateY(16deg) rotateX(5deg) translateZ(-40px);
+    transform-style: preserve-3d;
+  }
+  .hero__laptop :global(.laptop__lid) {
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.7);
+  }
+  .hero__phone {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 224px;
+    height: 456px;
+    transform: rotateY(-14deg) rotateX(4deg) translateZ(60px);
+  }
+  .hero__phone :global(.phone__device) {
+    box-shadow: 0 50px 90px rgba(0, 0, 0, 0.7);
+  }
+  .hero__mini {
+    display: none;
+  }
+  .hero__btns {
+    display: flex;
+    gap: 8px;
+  }
+  .hero__tabs {
+    display: flex;
+    gap: 18px;
+    border-bottom: 1px solid var(--line);
+    font: 500 12px/1 var(--font-body);
+  }
+  .hero__tabs div {
+    padding-bottom: 8px;
+    color: var(--faint);
+  }
+  .hero__tabs .is-on {
+    color: var(--fg);
+    border-bottom: 2px solid var(--accent);
+  }
+  .hero__spacer {
+    flex: 1;
+  }
+  /* The laptop screen wrapper must fill the 880×550 canvas so the agenda reaches the bottom. */
+  [data-hero-screen] {
+    height: 100%;
+  }
+  .hero__agenda {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  /* Screens light up once the particle outlines finish forming. */
+  :global(.hero__screen) {
+    transition: opacity 0.6s ease;
+  }
+  :global(html.motion [data-hero]:not(.screens-on) .hero__screen) {
+    opacity: 0;
+  }
+
+  @media (max-width: 819.98px) {
+    .hero {
+      min-height: auto;
+      padding: 92px 0 32px;
+    }
+    .hero__intro {
+      margin-top: 24px;
+    }
+    .hero__copy {
+      grid-column: 1 / -1;
+    }
+    .hero__stage {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: 100%;
+      height: 470px;
+      transform: none;
+      margin-top: 36px;
+    }
+    .hero__laptop {
+      display: none;
+    }
+    .hero__phone {
+      left: 8px;
+      right: auto;
+      transform: none;
+    }
+    .hero__mini {
+      display: block;
+      position: absolute;
+      right: 0;
+      bottom: 10px;
+      width: 172px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    }
+  }
+</style>

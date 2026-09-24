@@ -1,0 +1,23 @@
+---
+/**
+ * Canvas for the page-wide particle field (scripts/particles/field.ts).
+ * It sits behind every section (sections are z-index 2), so particles never
+ * cover devices or text. Elements marked `data-focus` are what they surround.
+ */
+---
+
+<canvas class="particles" data-particles aria-hidden="true"></canvas>
+
+<style>
+  .particles {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+  }
+  :global(html:not(.motion)) .particles {
+    display: none;
+  }
+</style>

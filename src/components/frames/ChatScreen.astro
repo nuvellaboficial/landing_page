@@ -1,0 +1,36 @@
+---
+/**
+ * WhatsApp-like conversation screen for a PhoneFrame. The body is rendered
+ * with the final conversation so the page reads well without JavaScript;
+ * scripts clear and replay it when motion is allowed.
+ */
+import type { ChatLine } from '../../lib/data';
+import { chatStatus, messagesHtml, visibleMessages } from '../../lib/templates';
+
+interface Props {
+  biz: string;
+  bizInitials: string;
+  clock?: string;
+  script: readonly ChatLine[];
+  /** Name used by scripts to find this chat: data-chat="<id>". */
+  id: string;
+}
+
+const { biz, bizInitials, clock = '9:41', script, id } = Astro.props;
+const messages = visibleMessages(script, script.length);
+---
+
+<div class="phone__status"><span>{clock}</span><span class="battery"></span></div>
+<div class="chat-head">
+  <span class="chat-head__back" aria-hidden="true">‹</span>
+  <div class="avatar avatar--brand" data-chat-initials>{bizInitials}</div>
+  <div>
+    <div class="chat-head__name" data-chat-biz>{biz}</div>
+    <div class="chat-head__status" data-chat-status>{chatStatus(messages)}</div>
+  </div>
+</div>
+<div class="chat-body" data-chat={id} aria-live="off" set:html={messagesHtml(messages)} />
+<div class="chat-input" aria-hidden="true">
+  <div class="chat-input__field">Mensaje</div>
+  <div class="chat-input__send"></div>
+</div>

@@ -1,0 +1,161 @@
+---
+import { NICHES } from '../lib/data';
+import { nicheScript } from '../lib/templates';
+import ChatScreen from './frames/ChatScreen.astro';
+import PhoneFrame from './frames/PhoneFrame.astro';
+
+const first = NICHES[0];
+---
+
+<section id="negocios" class="niches" data-niches>
+  <div class="page-grid niches__grid">
+    <h2 class="section-title niches__title">Hecho para negocios que viven de las citas.</h2>
+
+    <div class="niches__tabs" role="tablist" aria-label="Tipo de negocio">
+      {
+        NICHES.map((n, i) => (
+          <button
+            type="button"
+            role="tab"
+            class:list={['niches__tab', { 'is-active': i === 0 }]}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-niche-tab={i}
+          >
+            {n.tab}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="niches__phone" aria-hidden="true">
+      <PhoneFrame scale=".9" data-focus="niches">
+        <ChatScreen id="niches" biz={first.biz} bizInitials={first.bizInitials} script={nicheScript(first)} />
+      </PhoneFrame>
+    </div>
+
+    <ul class="niches__services is-in" data-niche-services>
+      {
+        first.services.map(([name, duration, price], i) => (
+          <li class="niche-svc" style={`--i:${i}`}>
+            <div>
+              <div class="niche-svc__name" data-svc-name>{name}</div>
+              <div class="niche-svc__dur" data-svc-duration>{duration}</div>
+            </div>
+            <div class="niche-svc__price" data-svc-price>{price}</div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .niches {
+    position: relative;
+    z-index: 2;
+    padding: var(--section-gap) 0 0;
+  }
+  .niches__grid {
+    row-gap: 40px;
+  }
+  .niches__title {
+    grid-column: 1 / span 6;
+  }
+  .niches__tabs {
+    grid-column: 7 / span 6;
+    align-self: end;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 12px;
+    scrollbar-width: none;
+  }
+  .niches__tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .niches__tab {
+    all: unset;
+    cursor: pointer;
+    flex: none;
+    scroll-snap-align: start;
+    padding: 11px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 2px;
+    font: 500 15px/1 var(--font-body);
+    color: var(--muted);
+    transition: all 0.2s ease;
+  }
+  .niches__tab:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .niches__tab.is-active {
+    color: var(--fg);
+    border-color: var(--accent);
+    background: rgba(255, 153, 51, 0.1);
+  }
+  .niches__phone {
+    grid-column: 1 / span 5;
+    display: flex;
+    justify-content: center;
+    padding: 0 12px;
+  }
+  .niches__services {
+    grid-column: 6 / span 7;
+    list-style: none;
+    margin: 0;
+    padding: 0 16px 0 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .niche-svc {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 26px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transition:
+      opacity 0.45s ease,
+      transform 0.6s var(--ease-out);
+  }
+  .is-in .niche-svc {
+    transition-delay: calc(0.1s + var(--i) * 0.09s);
+  }
+  :global(html.motion) .niches__services:not(.is-in) .niche-svc {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .niche-svc__name,
+  .niche-svc__price {
+    font: 400 clamp(26px, 2.6vw, 38px) / 1.1 var(--font-display);
+    letter-spacing: -0.03em;
+  }
+  .niche-svc__price {
+    color: var(--accent);
+    flex: none;
+  }
+  .niche-svc__dur {
+    font: 15px var(--font-body);
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 819.98px) {
+    .niches__title,
+    .niches__tabs,
+    .niches__phone,
+    .niches__services {
+      grid-column: 1 / -1;
+    }
+    .niches__tab {
+      border-radius: 99px;
+    }
+    .niche-svc__name,
+    .niche-svc__price {
+      font-size: 24px;
+    }
+  }
+</style>

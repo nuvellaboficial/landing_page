@@ -1,0 +1,195 @@
+---
+import { PANEL_ITEMS } from '../../lib/data';
+import DashShell from '../frames/DashShell.astro';
+import LaptopFrame from '../frames/LaptopFrame.astro';
+import PanelMobile from './PanelMobile.astro';
+import ScreenAgenda from './ScreenAgenda.astro';
+import ScreenCash from './ScreenCash.astro';
+import ScreenClients from './ScreenClients.astro';
+import ScreenDeposit from './ScreenDeposit.astro';
+import ScreenHome from './ScreenHome.astro';
+---
+
+<section id="tu-panel" class="pinned panel" style="--track:500vh" data-panel>
+  <div class="pinned__stage panel__stage">
+    <div class="panel__left">
+      <h2 class="section-title panel__title">Todo tu negocio en una pantalla.</h2>
+      <div class="panel__list" role="tablist" aria-label="Funciones del panel">
+        {
+          PANEL_ITEMS.map(([title, desc], i) => (
+            <button
+              type="button"
+              role="tab"
+              class:list={['panel__item', { 'is-active': i === 0 }]}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              data-panel-item={i}
+            >
+              <span class="panel__item-title">{title}</span>
+              <span class="panel__item-desc">{desc}</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="panel__device" aria-hidden="true">
+      <LaptopFrame width="var(--lap5-w)" scale="var(--lap5-scale)" data-focus="panel">
+        <DashShell active="Inicio">
+          <div class="dash__main panel__screens">
+            <ScreenHome />
+            <ScreenAgenda />
+            <ScreenCash />
+            <ScreenDeposit />
+            <ScreenClients />
+          </div>
+        </DashShell>
+      </LaptopFrame>
+    </div>
+
+    <div class="panel__mobile" aria-hidden="true">
+      <PanelMobile />
+    </div>
+    <div class="panel__carousel" data-panel-carousel>
+      {
+        PANEL_ITEMS.map(([title, desc], i) => (
+          <button type="button" class:list={['panel__card', { 'is-active': i === 0 }]} data-panel-card={i}>
+            <span class="panel__item-title">{title}</span>
+            <span class="panel__item-desc">{desc}</span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .panel {
+    margin-top: var(--section-gap);
+  }
+  .panel__stage {
+    row-gap: 28px;
+  }
+  .panel__left {
+    grid-column: 1 / span 4;
+    align-self: center;
+    padding: 0 16px 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .panel__title {
+    padding: 0;
+  }
+  .panel__list {
+    display: flex;
+    flex-direction: column;
+  }
+  .panel__item,
+  .panel__card {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .panel__item {
+    padding: 16px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 0.25s;
+  }
+  .panel__item:focus-visible,
+  .panel__card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .panel__item-title {
+    font: 500 21px/1.2 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--dim);
+    transition: color 0.2s;
+  }
+  .panel__item-desc {
+    font: 15px/1.5 var(--font-body);
+    color: var(--muted);
+  }
+  .panel__item:not(.is-active) .panel__item-desc {
+    display: none;
+  }
+  .panel__item.is-active {
+    border-top-color: var(--accent);
+  }
+  .is-active .panel__item-title {
+    color: var(--fg);
+  }
+  .panel__device {
+    grid-column: 5 / span 8;
+    padding: 0 12px;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+  }
+  .panel__device :global(.laptop__lid) {
+    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.7);
+  }
+  .panel__screens {
+    padding: 0;
+  }
+  .panel__mobile,
+  .panel__carousel {
+    display: none;
+  }
+
+  @media (max-width: 819.98px) {
+    /* Not pinned on mobile: the carousel drives the phone instead. */
+    .panel {
+      height: auto;
+    }
+    .panel__stage {
+      position: relative;
+      height: auto;
+      min-height: 0;
+    }
+    .panel__left {
+      grid-column: 1 / -1;
+    }
+    .panel__title {
+      padding: 0;
+    }
+    .panel__list,
+    .panel__device {
+      display: none;
+    }
+    .panel__mobile {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+    }
+    .panel__carousel {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 0 16px 8px;
+      scrollbar-width: none;
+    }
+    .panel__carousel::-webkit-scrollbar {
+      display: none;
+    }
+    .panel__card {
+      flex: 0 0 78%;
+      scroll-snap-align: center;
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--surface);
+      padding: 18px;
+      gap: 8px;
+    }
+    .panel__card.is-active {
+      border-color: var(--accent);
+    }
+    .panel__card .panel__item-title {
+      font-size: 20px;
+    }
+  }
+</style>

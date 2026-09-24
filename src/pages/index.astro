@@ -1,0 +1,49 @@
+---
+import Bot from '../components/Bot.astro';
+import Facts from '../components/Facts.astro';
+import Faq from '../components/Faq.astro';
+import Final from '../components/Final.astro';
+import Hero from '../components/Hero.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Nav from '../components/Nav.astro';
+import Niches from '../components/Niches.astro';
+import Panel from '../components/panel/Panel.astro';
+import ParticleCanvas from '../components/ParticleCanvas.astro';
+import Problem from '../components/Problem.astro';
+import Start from '../components/Start.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="NuvelLab · Tu WhatsApp agenda citas solo"
+  description="NuvelLab contesta el WhatsApp de tu negocio, agenda, cancela y reagenda citas con tu disponibilidad real y te deja todo listo en tu panel. Para spas, barberías, peluquerías caninas y clínicas en Colombia."
+>
+  <Nav />
+  <main class="page">
+    <ParticleCanvas />
+    <Hero />
+    <Problem />
+    <HowItWorks />
+    <Bot />
+    <Panel />
+    <Niches />
+    <Facts />
+    <Start />
+    <Faq />
+    <Final />
+  </main>
+</Layout>
+
+<script>
+  import '../scripts/main';
+</script>
+
+<style>
+  .page {
+    position: relative;
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: clip;
+    min-height: 100vh;
+  }
+</style>

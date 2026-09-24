@@ -1,0 +1,155 @@
+---
+import { NOTIFICATIONS } from '../lib/data';
+import PhoneFrame from './frames/PhoneFrame.astro';
+---
+
+<section class="pinned problem" style="--track:260vh;--track-mobile:230vh" data-problem>
+  <div class="pinned__stage">
+    <div class="problem__text">
+      <h2 class="problem__title">Tu WhatsApp no para. Tú tampoco.</h2>
+      <p class="lede">
+        Mensajes a las 11 de la noche, clientes preguntando precios en plena cita y reservas que se pierden porque nadie
+        alcanzó a contestar.
+      </p>
+    </div>
+    <div class="problem__phone" aria-hidden="true">
+      <PhoneFrame scale="var(--k2)" screenClass="lock" data-focus="problem">
+        <div class="phone__status lock__status"><span>11:04</span><span class="battery"></span></div>
+        <div class="lock__clock">11:04</div>
+        <div class="lock__date">jueves, 24 de septiembre</div>
+        <!-- Final state (every message answered); scripts replay the pile-up. -->
+        <div class="lock__list is-ordered" data-notifs>
+          {
+            NOTIFICATIONS.map(([name]) => (
+              <div class="notif-done">
+                <span class="notif-done__name">{name}</span>
+                <span class="notif-done__ok">Respondido ✓</span>
+              </div>
+            ))
+          }
+        </div>
+      </PhoneFrame>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pinned__stage {
+    row-gap: 32px;
+  }
+  .problem__text {
+    grid-column: 1 / span 6;
+    grid-row: 1;
+    align-self: center;
+    padding: 0 16px 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .problem__title {
+    margin: 0;
+    font: 400 clamp(40px, 5.2vw, 84px) / 0.98 var(--font-display);
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+  .problem__phone {
+    grid-column: 8 / span 4;
+    grid-row: 1;
+    display: flex;
+    justify-content: center;
+  }
+  :global(.lock) {
+    background: #0e0e0e;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+  .lock__status {
+    padding: 14px 14px 0;
+  }
+  .lock__clock {
+    text-align: center;
+    margin-top: 18px;
+    font: 300 60px/1 var(--font-display);
+    letter-spacing: -0.03em;
+  }
+  .lock__date {
+    text-align: center;
+    font: 13px var(--font-body);
+    color: #b0b0b0;
+    margin-top: 6px;
+  }
+  .lock__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .lock__list.is-ordered {
+    gap: 4px;
+  }
+
+  /* Rendered by scripts/sections/problem.ts */
+  .lock__list :global(.notif) {
+    background: rgba(38, 38, 38, 0.96);
+    border-radius: 14px;
+    padding: 9px 11px;
+    display: flex;
+    gap: 9px;
+    transition: transform 0.5s var(--ease-out);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  }
+  .lock__list :global(.notif__icon) {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--surface-3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex: none;
+  }
+  .lock__list :global(.notif__body) {
+    min-width: 0;
+    flex: 1;
+  }
+  .lock__list :global(.notif__top) {
+    display: flex;
+    justify-content: space-between;
+    font: 600 11.5px var(--font-body);
+  }
+  .lock__list :global(.notif__time) {
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .lock__list :global(.notif__text) {
+    font: 12px/1.35 var(--font-body);
+    color: #d6d6d6;
+  }
+  .lock__list :global(.notif-done) {
+    background: #161616;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    font: 11px/1.3 var(--font-body);
+    animation: pop 0.45s var(--ease-out) both;
+  }
+  .lock__list :global(.notif-done__name) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lock__list :global(.notif-done__ok) {
+    color: var(--accent);
+    flex: none;
+  }
+
+  @media (max-width: 819.98px) {
+    .problem__text {
+      grid-column: 1 / -1;
+    }
+    .problem__phone {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+</style>

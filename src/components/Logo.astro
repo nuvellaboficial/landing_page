@@ -1,0 +1,23 @@
+---
+interface Props {
+  size?: number;
+}
+const { size = 21 } = Astro.props;
+---
+
+<span class="logo" style={`font-size:${size}px`}>Nuvel<span class="logo__accent">Lab</span></span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--fg);
+  }
+  .logo__accent {
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth;background:#0a0a0a}
+body{margin:0;background:#0a0a0a;color:#ebebeb;-webkit-font-smoothing:antialiased}
+a{color:#ebebeb;text-decoration:none}
+a:hover{color:#ff9933}
+::selection{background:#c95000;color:#fff}
+@keyframes nlPop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes nlDot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@keyframes nlDrag{0%,18%{transform:translate(0,0)}42%,78%{transform:translate(203px,60px)}100%{transform:translate(0,0)}}
+@keyframes nlCurIn{0%{transform:translate(-200px,-150px);opacity:0}20%{opacity:1}70%,100%{transform:translate(0,0);opacity:1}}
+@keyframes nlRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="position:relative;background:#0a0a0a;color:#ebebeb;font-family:Inter,sans-serif;overflow-x:clip;min-height:100vh">
+
+<div style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(to right,rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.045) 1px,transparent 1px);background-size:{{grid.size}};opacity:{{grid.lo}};transition:opacity .9s ease"></div>
+<div style="position:absolute;inset:0;pointer-events:none;background-image:{{grid.cross}};background-size:{{grid.size}};background-position:{{grid.cpos}};opacity:{{grid.co}};transition:opacity .5s ease"></div>
+<div ref="{{rSpot}}" style="position:fixed;inset:0;pointer-events:none;z-index:1;background-image:{{grid.spot}};background-size:{{grid.size}};background-position:{{grid.cpos}};opacity:{{grid.spotO}};-webkit-mask-image:radial-gradient(220px circle at -500px -500px,#000,transparent 70%);mask-image:radial-gradient(220px circle at -500px -500px,#000,transparent 70%)"></div>
+<canvas ref="{{rCanvas}}" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:6"></canvas>
+
+<!-- NAV -->
+<header style="position:fixed;top:0;left:0;right:0;z-index:50;height:{{nav.h}};display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 {{nav.pad}};background:{{nav.bg}};backdrop-filter:{{nav.blur}};-webkit-backdrop-filter:{{nav.blur}};border-bottom:1px solid {{nav.bd}};transition:height .25s ease,background .25s ease,border-color .25s ease">
+  <a href="#top" style="display:flex;align-items:baseline;gap:2px;font:500 21px/1 Geist,sans-serif;letter-spacing:-.03em;color:#ebebeb">Nuvel<span style="color:#ff9933">Lab</span></a>
+  <sc-if value="{{navFull}}" hint-placeholder-val="{{ true }}">
+    <nav style="display:flex;gap:28px;white-space:nowrap;font:400 12px/1 'Geist Mono',monospace;letter-spacing:.14em;text-transform:uppercase">
+      <sc-for list="{{navLinks}}" as="l" hint-placeholder-count="5"><a href="{{l.href}}" style="color:#999999" style-hover="color:#ebebeb">{{l.label}}</a></sc-for>
+    </nav>
+    <div style="display:flex;align-items:center;gap:22px">
+      <a href="https://app.nuvellab.cloud" style="font:400 12px/1 'Geist Mono',monospace;letter-spacing:.14em;color:#ebebeb">INGRESAR</a>
+      <a href="{{wa}}" target="_blank" style="background:#c95000;color:#ffffff;font:500 12px/1 'Geist Mono',monospace;letter-spacing:.12em;padding:13px 16px;border-radius:2px;white-space:nowrap">[ AGENDA UNA DEMO ]</a>
+    </div>
+  </sc-if>
+  <sc-if value="{{navMenu}}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{openMenu}}" style="background:none;border:1px solid rgba(255,255,255,.18);color:#ebebeb;font:500 12px/1 'Geist Mono',monospace;letter-spacing:.14em;padding:13px 14px;border-radius:2px;cursor:pointer">[ MENÚ ]</button>
+  </sc-if>
+</header>
+<sc-if value="{{menu}}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:60;background:#0a0a0a;display:flex;flex-direction:column;padding:20px 16px 28px;gap:28px">
+    <div style="display:flex;justify-content:space-between;align-items:center;height:28px">
+      <span style="font:500 21px/1 Geist,sans-serif;letter-spacing:-.03em">Nuvel<span style="color:#ff9933">Lab</span></span>
+      <button onClick="{{closeMenu}}" style="background:none;border:1px solid rgba(255,255,255,.18);color:#ebebeb;font:500 12px/1 'Geist Mono',monospace;letter-spacing:.14em;padding:13px 14px;border-radius:2px">[ CERRAR ]</button>
+    </div>
+    <nav style="display:flex;flex-direction:column;flex:1;justify-content:center">
+      <sc-for list="{{navLinks}}" as="l" hint-placeholder-count="5"><a href="{{l.href}}" onClick="{{closeMenu}}" style="font:400 28px/1 'Geist Mono',monospace;letter-spacing:.06em;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.08);color:#ebebeb">{{l.label}}</a></sc-for>
+      <a href="https://app.nuvellab.cloud" style="font:400 28px/1 'Geist Mono',monospace;letter-spacing:.06em;padding:18px 0;color:#999999">INGRESAR</a>
+    </nav>
+    <a href="{{wa}}" target="_blank" style="background:#c95000;color:#ffffff;font:500 14px/1 'Geist Mono',monospace;letter-spacing:.12em;padding:20px;text-align:center;border-radius:2px">[ AGENDA UNA DEMO → ]</a>
+  </div>
+</sc-if>
+
+<!-- 1 HERO -->
+<section id="top" ref="{{rHero}}" data-screen-label="01 Hero" style="position:relative;z-index:2;min-height:{{hv.minH}};padding:{{hv.pad}};box-sizing:border-box">
+  <h1 style="margin:0;display:grid;grid-template-columns:{{grid.cols}};font-family:Geist,sans-serif;font-weight:400;font-size:{{hv.fs}};line-height:.95;letter-spacing:-.055em;color:#ebebeb">
+    <div style="grid-column:{{hv.w1}};overflow:hidden;padding:0 0 .06em 12px"><div style="transform:{{hv.t1}};transition:transform .9s cubic-bezier(.16,1,.3,1)">Cada mensaje</div></div>
+    <div style="grid-column:{{hv.w2}};overflow:hidden;padding:0 0 .06em 12px"><div style="transform:{{hv.t2}};transition:transform .9s cubic-bezier(.16,1,.3,1)">se vuelve</div></div>
+    <div style="grid-column:{{hv.w3}};overflow:hidden;padding:0 0 .06em 12px"><div style="transform:{{hv.t3}};transition:transform .9s cubic-bezier(.16,1,.3,1)">una cita.</div></div>
+  </h1>
+  <div style="display:grid;grid-template-columns:{{grid.cols}};margin-top:{{hv.subM}};opacity:{{hv.subO}};transform:{{hv.subT}};transition:opacity .7s ease,transform .8s cubic-bezier(.16,1,.3,1);position:relative;z-index:3">
+    <div style="grid-column:{{hv.subC}};padding:0 16px 0 12px;display:flex;flex-direction:column;gap:28px">
+      <p style="margin:0;font:400 18px/1.55 Inter,sans-serif;color:#999999;max-width:40ch;text-wrap:pretty">NuvelLab contesta el WhatsApp de tu negocio, agenda con tu disponibilidad real y te deja todo listo en tu panel.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <a href="{{wa}}" target="_blank" style="display:inline-flex;align-items:center;background:#c95000;color:#ffffff;font:500 13px/1 'Geist Mono',monospace;letter-spacing:.12em;padding:18px 20px;border-radius:2px" style-hover="color:#ffffff;background:#b84800">[ AGENDA UNA DEMO → ]</a>
+        <a href="#como-funciona" style="display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.18);color:#ebebeb;font:500 13px/1 'Geist Mono',monospace;letter-spacing:.12em;padding:17px 20px;border-radius:2px" style-hover="border-color:#ff9933;color:#ebebeb">[ CÓMO FUNCIONA ↓ ]</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:{{hv.pos}};right:{{hv.right}};bottom:{{hv.bottom}};width:{{hv.w}};height:{{hv.h}};transform:{{hv.tr}};transform-origin:100% 100%;perspective:1800px;margin-top:{{hv.devM}};z-index:2">
+    <div ref="{{rDev}}" style="position:absolute;inset:0;transform-style:preserve-3d">
+      <sc-if value="{{D}}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;left:0;top:60px;width:600px;transform:rotateY(16deg) rotateX(5deg) translateZ(-40px);transform-style:preserve-3d">
+          <div ref="{{rLap}}" style="border:1px solid rgba(255,255,255,.14);border-radius:14px 14px 4px 4px;padding:8px;background:#050505;box-shadow:0 40px 90px rgba(0,0,0,.7)">
+            <div style="position:relative;width:100%;aspect-ratio:880/550;overflow:hidden;border-radius:6px;background:#0d0d0d">
+              <div style="position:absolute;left:0;top:0;width:880px;height:550px;transform-origin:0 0;transform:scale(0.6614);opacity:{{hv.scr}};transition:opacity .6s ease;display:flex;flex-direction:column;background:#0d0d0d">
+                <div style="height:34px;flex:none;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px;background:#111111"><span style="width:10px;height:10px;border-radius:50%;border:1.4px solid #666"></span><span style="width:10px;height:10px;border-radius:50%;border:1.4px solid #666"></span><span style="width:18px;height:18px;border-radius:50%;background:#3a2410;color:#ff9933;font:600 9px/18px Inter;text-align:center">S</span></div>
+                <div style="flex:1;display:flex;min-height:0">
+                  <div style="width:160px;flex:none;border-right:1px solid rgba(255,255,255,.07);padding:14px 10px;display:flex;flex-direction:column;gap:2px;background:#101010">
+                    <div style="font:600 13px/1 Geist,sans-serif;color:#ebebeb;padding:2px 8px">NuvelLab</div>
+                    <div style="font:500 8px/1 Inter;letter-spacing:.12em;color:#8a8a8a;padding:4px 8px 12px">PORTAL DE GESTIÓN</div>
+                    <sc-for list="{{navCitas}}" as="i" hint-placeholder-count="10"><div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font:500 11px/1 Inter;color:{{i.c}};background:{{i.bg}}"><span style="width:10px;height:10px;border:1.4px solid currentColor;border-radius:3px"></span>{{i.label}}</div></sc-for>
+                    <div style="margin-top:auto;border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:7px 8px;display:flex;justify-content:space-between;font:10px Inter;color:#999">Estado del Bot<span style="color:#ebebeb"><span style="color:#4ade80">●</span> Activo</span></div>
+                  </div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;padding:16px 20px;gap:12px">
+                    <div style="display:flex;justify-content:space-between;align-items:center"><div style="font:600 22px/1 Geist,sans-serif;letter-spacing:-.02em">Citas</div><div style="display:flex;gap:8px"><div style="border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 11px;font:500 11px/1 Inter">Cita recurrente</div><div style="background:#ff9933;border-radius:7px;padding:7px 11px;font:500 11px/1 Inter;color:#1a0e02">+ Nueva cita</div></div></div>
+                    <div style="display:flex;gap:18px;border-bottom:1px solid rgba(255,255,255,.08);font:500 12px/1 Inter"><div style="padding-bottom:8px;border-bottom:2px solid #ff9933">Agenda</div><div style="color:#8a8a8a">Recurrentes</div></div>
+                    <div style="display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:5px;background:#121212;font:500 11px/1 Inter"><div style="display:flex;background:#1a1a1a;border-radius:99px;padding:2px"><span style="background:#ff9933;color:#1a0e02;border-radius:99px;padding:5px 10px">Día</span><span style="color:#999;padding:5px 10px">Semana</span></div><span style="color:#999">{{hA.date}}</span><span style="flex:1"></span><div style="display:flex;background:#1a1a1a;border-radius:99px;padding:2px"><span style="color:#999;padding:5px 10px">Lista</span><span style="background:#ff9933;color:#1a0e02;border-radius:99px;padding:5px 10px">Calendario</span></div></div>
+                    <div style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#101010;overflow:hidden;display:flex;flex-direction:column">
+                      <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.08);flex:none"><div style="width:70px;flex:none"></div><sc-for list="{{hA.cols}}" as="c" hint-placeholder-count="3"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-left:1px solid rgba(255,255,255,.06)"><div style="width:24px;height:24px;border-radius:50%;background:#1f1f1f;color:#ebebeb;display:grid;place-items:center;font:600 9px Inter">{{c.ini}}</div><div style="font:500 11px Inter">{{c.name}}</div></div></sc-for></div>
+                      <div style="position:relative;flex:1">
+                        <sc-for list="{{hA.hours}}" as="h" hint-placeholder-count="5"><div style="position:absolute;left:0;right:0;top:{{h.top}}px;border-top:1px solid rgba(255,255,255,.06)"><div style="width:62px;text-align:right;font:10px Inter;color:#8a8a8a;transform:translateY(-6px);padding-right:6px">{{h.label}}</div></div></sc-for>
+                        <div style="position:absolute;left:70px;right:0;top:0;bottom:0">
+                          <sc-for list="{{hA.cols}}" as="c" hint-placeholder-count="3"><div style="position:absolute;top:0;bottom:0;left:{{c.left}}px;border-left:1px solid rgba(255,255,255,.06)"></div></sc-for>
+                          <sc-for list="{{hA.blocks}}" as="b" hint-placeholder-count="4"><div style="position:absolute;left:{{b.left}}px;top:{{b.top}}px;width:{{b.w}}px;height:{{b.h}}px;box-sizing:border-box;background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:5px 7px;overflow:hidden;font:10px/1.35 Inter"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{b.name}}</div><div style="color:#999">{{b.svc}}</div></div></sc-for>
+                          <div ref="{{rTarget}}" style="position:absolute;left:{{hA.t.left}}px;top:{{hA.t.top}}px;width:{{hA.t.w}}px;height:{{hA.t.h}}px;box-sizing:border-box;border-radius:6px;padding:5px 7px;overflow:hidden;font:10px/1.35 Inter;background:rgba(255,153,51,.14);border:1px solid #ff9933;opacity:{{hT.o}};box-shadow:{{hT.sh}};transform:{{hT.tr}};transition:opacity .5s ease,box-shadow 1.3s ease,transform .6s cubic-bezier(.16,1,.3,1)"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{hA.t.name}}</div><div style="color:#ebebeb">{{hA.t.svc}} · {{hA.t.price}}</div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="height:12px;margin:0 -5%;background:#161616;border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 12px 12px"></div>
+        </div>
+      </sc-if>
+
+      <div style="position:absolute;left:{{hv.phL}};right:{{hv.phR}};top:0;width:224px;height:456px;transform:{{hv.phTr}}">
+        <div ref="{{rPhone}}" style="width:280px;height:570px;transform:scale(.8);transform-origin:0 0;box-sizing:border-box;border-radius:44px;border:1px solid rgba(255,255,255,.16);background:#050505;padding:8px;box-shadow:0 50px 90px rgba(0,0,0,.7)">
+          <div style="width:100%;height:100%;border-radius:36px;overflow:hidden;background:#0c0c0c;display:flex;flex-direction:column;opacity:{{hv.scr}};transition:opacity .6s ease">
+            <div style="display:flex;justify-content:space-between;padding:14px 24px 6px;font:600 12px Inter"><span>9:41</span><span style="width:18px;height:9px;border:1px solid #ebebeb;border-radius:3px"></span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)"><span style="color:#999;font:20px/1 Inter">‹</span><div style="width:32px;height:32px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 11px Inter;color:#ff9933">{{hn.bi}}</div><div><div style="font:600 13px Inter">{{hn.biz}}</div><div style="font:11px Inter;color:#999">{{hStatus}}</div></div></div>
+            <div ref="{{rBubble}}" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:12px 10px;overflow:hidden">
+              <sc-for list="{{heroMsgs}}" as="m" hint-placeholder-count="0">
+                <sc-if value="{{m.cl}}"><div style="align-self:flex-end;max-width:82%;background:#2a1b0d;border-radius:12px 12px 3px 12px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#a8998a;text-align:right;margin-top:2px">{{m.time}} <span style="color:#ff9933">✓✓</span></div></div></sc-if>
+                <sc-if value="{{m.bot}}"><div style="align-self:flex-start;max-width:82%;background:#1c1c1c;border-radius:12px 12px 12px 3px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#999;text-align:right;margin-top:2px">{{m.time}}</div></div></sc-if>
+                <sc-if value="{{m.typing}}"><div style="align-self:flex-start;background:#1c1c1c;border-radius:12px;padding:11px 12px;display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .15s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .3s infinite"></span></div></sc-if>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:8px;padding:8px 10px 16px;align-items:center"><div style="flex:1;background:#1a1a1a;border-radius:99px;padding:9px 14px;font:12px Inter;color:#8a8a8a">Mensaje</div><div style="width:32px;height:32px;border-radius:50%;background:#1f1f1f"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{M}}" hint-placeholder-val="{{ false }}">
+        <div ref="{{rLap}}" style="position:absolute;right:0;bottom:10px;width:172px;box-sizing:border-box;background:#121212;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px;box-shadow:0 30px 60px rgba(0,0,0,.6);opacity:{{hv.scr}};transition:opacity .6s ease">
+          <div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07)"><div style="width:24px;height:24px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 9px Inter">{{hC.ini}}</div><div style="font:600 11px Inter;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{hC.name}}</div></div>
+          <div style="position:relative;height:118px;margin-top:6px">
+            <sc-for list="{{hC.rows}}" as="r" hint-placeholder-count="3"><div style="position:absolute;left:0;right:0;top:{{r.top}}px;border-top:1px solid rgba(255,255,255,.06);font:9px Inter;color:#8a8a8a;padding-top:2px">{{r.label}}</div></sc-for>
+            <div ref="{{rTarget}}" style="position:absolute;left:44px;right:0;top:40px;height:36px;box-sizing:border-box;border-radius:6px;padding:4px 6px;font:9px/1.3 Inter;background:rgba(255,153,51,.14);border:1px solid #ff9933;opacity:{{hT.o}};box-shadow:{{hT.sh}};transform:{{hT.tr}};transition:opacity .5s ease,box-shadow 1.3s ease,transform .6s cubic-bezier(.16,1,.3,1)"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{hA.t.name}}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{hA.t.svc}}</div></div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</section>
+  <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;z-index:3;max-width:{{hv.noteW}};margin:{{hv.noteM}};display:block;z-index:4;border:1px dashed rgba(255,153,51,.45);background:rgba(10,10,10,.88);padding:12px 14px;font:italic 400 12px/1.5 Inter;color:#b3b3b3">
+      <div style="font-style:normal;font-weight:600;color:#ff9933;margin-bottom:4px">Nota de movimiento · Hero · estado: {{heroStateLabel}}</div>
+      Entrada 2,5 s: cruces del grid y luego sus líneas (0 a 0,6 s), nube de partículas (0,4 s), H1 por máscara de abajo arriba con 150 ms entre bloques (expo.out 900 ms), la nube se condensa en los contornos (1,1 a 2 s) y se encienden las pantallas, subtítulo y CTAs (2,15 s). Bucle de 8,8 s por nicho: chat, confirmación, chorro de partículas en arco (1,1 s) y la cita se materializa con un brillo que se apaga en 1,3 s. Cursor: inclinación hasta 8° con resorte, las partículas se apartan en 130 px y un foco ilumina las cruces. Salida: los dispositivos suben y se desvanecen y las partículas se dispersan por la pantalla. Cambia el estado desde Tweaks.
+    </div>
+  </sc-if>
+
+<!-- 2 PROBLEMA -->
+<section ref="{{rS2}}" data-screen-label="02 El problema" style="position:relative;z-index:2;height:{{L.s2h}}">
+  <div style="position:{{L.stk}};top:0;height:{{L.stkH}};min-height:100vh;display:grid;grid-template-columns:{{grid.cols}};align-content:center;row-gap:32px;box-sizing:border-box;padding:{{L.stkPad}}">
+    <div style="grid-column:{{g.s2t}};grid-row:{{g.s2tr}};padding:0 16px 0 12px;display:flex;flex-direction:column;gap:24px;align-self:center">
+      <h2 style="margin:0;font:400 clamp(40px,5.2vw,84px)/.98 Geist,sans-serif;letter-spacing:-.045em;text-wrap:balance">Tu WhatsApp no para. Tú tampoco.</h2>
+      <p style="margin:0;font:400 18px/1.55 Inter;color:#999999;max-width:40ch;text-wrap:pretty">Mensajes a las 11 de la noche, clientes preguntando precios en plena cita y reservas que se pierden porque nadie alcanzó a contestar.</p>
+    </div>
+    <div style="grid-column:{{g.s2p}};grid-row:{{g.s2pr}};display:flex;justify-content:center">
+      <div style="width:{{ph2.w}}px;height:{{ph2.h}}px">
+        <div style="width:280px;height:570px;transform:scale({{ph2.k}});transform-origin:0 0;box-sizing:border-box;border-radius:44px;border:1px solid rgba(255,255,255,.16);background:#050505;padding:8px">
+          <div style="width:100%;height:100%;border-radius:36px;background:#0e0e0e;display:flex;flex-direction:column;padding:0 10px;box-sizing:border-box">
+            <div style="display:flex;justify-content:space-between;padding:14px 14px 0;font:600 12px Inter"><span>11:04</span><span style="width:18px;height:9px;border:1px solid #ebebeb;border-radius:3px"></span></div>
+            <div style="text-align:center;margin-top:18px;font:300 60px/1 Geist,sans-serif;letter-spacing:-.03em">11:04</div>
+            <div style="text-align:center;font:13px Inter;color:#b0b0b0;margin-top:6px">jueves, 24 de septiembre</div>
+            <div style="display:flex;flex-direction:column;gap:{{s2.gap}}px;margin-top:20px">
+              <sc-for list="{{notifs}}" as="n" hint-placeholder-count="0">
+                <sc-if value="{{n.full}}"><div style="background:rgba(38,38,38,.96);border-radius:14px;padding:9px 11px;display:flex;gap:9px;transform:{{n.tr}};transition:transform .5s cubic-bezier(.16,1,.3,1);box-shadow:0 10px 24px rgba(0,0,0,.5)"><div style="width:26px;height:26px;border-radius:7px;background:#1a1a1a;border:1px solid rgba(255,255,255,.1);flex:none"></div><div style="min-width:0;flex:1"><div style="display:flex;justify-content:space-between;font:600 11.5px Inter"><span>{{n.name}}</span><span style="font-weight:400;color:#999">{{n.time}}</span></div><div style="font:12px/1.35 Inter;color:#d6d6d6">{{n.text}}</div></div></div></sc-if>
+                <sc-if value="{{n.done}}"><div style="background:#161616;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;font:11px/1.3 Inter;animation:nlPop .45s cubic-bezier(.16,1,.3,1) both"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{n.name}}</span><span style="color:#ff9933;flex:none">Respondido ✓</span></div></sc-if>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:520px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Fijada 260 vh. Entrada: las partículas dispersas del hero flotan alrededor. Scroll: las notificaciones se apilan cada vez más rápido (curva p^1,7) y se desbordan del celular girando. Salida: al 84 % se ordenan solas como lista respondida y las partículas se apagan.</div></sc-if>
+  </div>
+</section>
+
+<!-- 3 CÓMO FUNCIONA -->
+<section id="como-funciona" ref="{{rS3}}" data-screen-label="03 Cómo funciona" style="position:relative;z-index:2;height:{{L.s3h}}">
+  <div style="position:{{L.stk}};top:0;height:{{L.stkH}};min-height:100vh;display:grid;grid-template-columns:{{grid.cols}};align-content:center;row-gap:{{g.s3gap}};box-sizing:border-box;padding:{{L.stkPad}}">
+    <h2 style="grid-column:{{g.s3h}};margin:0;padding:0 16px 0 12px;font:400 {{g.h2fs}}/1 Geist,sans-serif;letter-spacing:-.04em;text-wrap:balance">Así se agenda una cita sin que toques el celular.</h2>
+    <div style="grid-column:{{g.s3l}};grid-row:{{g.s3lr}};padding:0 16px 0 12px;display:flex;flex-direction:column;gap:{{g.s3stepGap}};align-self:center">
+      <sc-for list="{{steps3}}" as="st" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:28px 1fr;gap:8px;opacity:{{st.o}};transition:opacity .25s ease"><div style="font:500 16px/1.3 Geist,sans-serif;color:{{st.nc}};transition:color .2s">{{st.n}}</div><div><div style="font:500 {{g.s3tfs}}/1.25 Geist,sans-serif;letter-spacing:-.02em;color:{{st.tc}};transition:color .2s">{{st.title}}</div><div style="font:15px/1.5 Inter;color:{{st.dc}};margin-top:4px;display:{{st.dd}}">{{st.text}}</div></div></div></sc-for>
+    </div>
+    <div style="grid-column:{{g.s3d}};grid-row:{{g.s3dr}};display:flex;align-items:{{g.s3align}};justify-content:center;gap:{{g.s3devGap}};padding:0 12px">
+      <div style="width:{{ph3.w}}px;height:{{ph3.h}}px;flex:none">
+        <div style="width:280px;height:570px;transform:scale({{ph3.k}});transform-origin:0 0;box-sizing:border-box;border-radius:44px;border:1px solid rgba(255,255,255,.16);background:#050505;padding:8px">
+          <div style="width:100%;height:100%;border-radius:36px;overflow:hidden;background:#0c0c0c;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;padding:14px 24px 6px;font:600 12px Inter"><span>11:48</span><span style="width:18px;height:9px;border:1px solid #ebebeb;border-radius:3px"></span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)"><span style="color:#999;font:20px/1 Inter">‹</span><div style="width:32px;height:32px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 11px Inter;color:#ff9933">SA</div><div><div style="font:600 13px Inter">Spa Aurora</div><div style="font:11px Inter;color:#999">{{s3Status}}</div></div></div>
+            <div ref="{{rB3}}" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:12px 10px;overflow:hidden">
+              <sc-for list="{{msgs3}}" as="m" hint-placeholder-count="0">
+                <sc-if value="{{m.cl}}"><div style="align-self:flex-end;max-width:82%;background:#2a1b0d;border-radius:12px 12px 3px 12px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .35s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#a8998a;text-align:right;margin-top:2px">{{m.time}} <span style="color:#ff9933">✓✓</span></div></div></sc-if>
+                <sc-if value="{{m.bot}}"><div style="align-self:flex-start;max-width:82%;background:#1c1c1c;border-radius:12px 12px 12px 3px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .35s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#999;text-align:right;margin-top:2px">{{m.time}}</div></div></sc-if>
+                <sc-if value="{{m.typing}}"><div style="align-self:flex-start;background:#1c1c1c;border-radius:12px;padding:11px 12px;display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .15s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .3s infinite"></span></div></sc-if>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:8px;padding:8px 10px 16px;align-items:center"><div style="flex:1;background:#1a1a1a;border-radius:99px;padding:9px 14px;font:12px Inter;color:#8a8a8a">Mensaje</div><div style="width:32px;height:32px;border-radius:50%;background:#1f1f1f"></div></div>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{D}}" hint-placeholder-val="{{ true }}">
+        <div style="width:{{lap3.w}}px;flex:none">
+          <div style="border:1px solid rgba(255,255,255,.14);border-radius:14px 14px 4px 4px;padding:8px;background:#050505">
+            <div style="position:relative;width:100%;aspect-ratio:880/550;overflow:hidden;border-radius:6px;background:#0d0d0d">
+              <div style="position:absolute;left:0;top:0;width:880px;height:550px;transform-origin:0 0;transform:scale({{lap3.k}});display:flex;flex-direction:column">
+                <div style="height:34px;flex:none;border-bottom:1px solid rgba(255,255,255,.07);background:#111111"></div>
+                <div style="flex:1;display:flex;min-height:0">
+                  <div style="width:160px;flex:none;border-right:1px solid rgba(255,255,255,.07);padding:14px 10px;display:flex;flex-direction:column;gap:2px;background:#101010">
+                    <div style="font:600 13px/1 Geist,sans-serif;padding:2px 8px">NuvelLab</div>
+                    <div style="font:500 8px/1 Inter;letter-spacing:.12em;color:#8a8a8a;padding:4px 8px 12px">PORTAL DE GESTIÓN</div>
+                    <sc-for list="{{navCitas}}" as="i" hint-placeholder-count="10"><div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font:500 11px/1 Inter;color:{{i.c}};background:{{i.bg}}"><span style="width:10px;height:10px;border:1.4px solid currentColor;border-radius:3px"></span>{{i.label}}</div></sc-for>
+                  </div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;padding:16px 20px;gap:12px">
+                    <div style="font:600 22px/1 Geist,sans-serif;letter-spacing:-.02em">Citas</div>
+                    <div style="display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:5px;background:#121212;font:500 11px/1 Inter"><div style="display:flex;background:#1a1a1a;border-radius:99px;padding:2px"><span style="background:#ff9933;color:#1a0e02;border-radius:99px;padding:5px 10px">Día</span><span style="color:#999;padding:5px 10px">Semana</span></div><span style="color:#999">{{tA.date}}</span></div>
+                    <div style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#101010;overflow:hidden;display:flex;flex-direction:column">
+                      <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.08);flex:none"><div style="width:70px;flex:none"></div><sc-for list="{{tA.cols}}" as="c" hint-placeholder-count="3"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-left:1px solid rgba(255,255,255,.06)"><div style="width:24px;height:24px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 9px Inter">{{c.ini}}</div><div style="font:500 11px Inter">{{c.name}}</div></div></sc-for></div>
+                      <div style="position:relative;flex:1">
+                        <sc-for list="{{tA.hours}}" as="h" hint-placeholder-count="5"><div style="position:absolute;left:0;right:0;top:{{h.top}}px;border-top:1px solid rgba(255,255,255,.06)"><div style="width:62px;text-align:right;font:10px Inter;color:#8a8a8a;transform:translateY(-6px);padding-right:6px">{{h.label}}</div></div></sc-for>
+                        <div style="position:absolute;left:70px;right:0;top:0;bottom:0">
+                          <sc-for list="{{tA.blocks}}" as="b" hint-placeholder-count="4"><div style="position:absolute;left:{{b.left}}px;top:{{b.top}}px;width:{{b.w}}px;height:{{b.h}}px;box-sizing:border-box;background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:5px 7px;overflow:hidden;font:10px/1.35 Inter"><div style="font-weight:600">{{b.name}}</div><div style="color:#999">{{b.svc}}</div></div></sc-for>
+                          <div ref="{{rT3D}}" style="position:absolute;left:{{tA.t.left}}px;top:{{tA.t.top}}px;width:{{tA.t.w}}px;height:{{tA.t.h}}px;box-sizing:border-box;border-radius:6px;padding:5px 7px;font:10px/1.35 Inter;background:rgba(255,153,51,.14);border:1px solid #ff9933;opacity:{{t3.o}};box-shadow:{{t3.sh}};transform:{{t3.tr}};transition:opacity .4s ease,box-shadow .9s ease,transform .5s cubic-bezier(.16,1,.3,1)"><div style="font-weight:600">{{tA.t.name}}</div><div>{{tA.t.svc}} · {{tA.t.price}}</div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="height:10px;margin:0 -5%;background:#161616;border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 10px 10px"></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{M}}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-width:0;background:#121212;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px">
+          <div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07)"><div style="width:22px;height:22px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 9px Inter">CO</div><div style="font:600 11px Inter">Camila Ortiz</div></div>
+          <div style="font:10px Inter;color:#999;padding:6px 0 2px">Sábado, 26 sep</div>
+          <div style="position:relative;height:118px">
+            <sc-for list="{{tC.rows}}" as="r" hint-placeholder-count="3"><div style="position:absolute;left:0;right:0;top:{{r.top}}px;border-top:1px solid rgba(255,255,255,.06);font:9px Inter;color:#8a8a8a;padding-top:2px">{{r.label}}</div></sc-for>
+            <div ref="{{rT3M}}" style="position:absolute;left:0;right:0;top:52px;height:36px;box-sizing:border-box;border-radius:6px;padding:4px 6px;font:9px/1.3 Inter;background:rgba(255,153,51,.14);border:1px solid #ff9933;opacity:{{t3.o}};box-shadow:{{t3.sh}};transform:{{t3.tr}};transition:opacity .4s ease,box-shadow .9s ease,transform .5s cubic-bezier(.16,1,.3,1)"><div style="font-weight:600">Daniela Muñoz</div><div>Masaje relajante</div></div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    <div ref="{{rTok}}" style="position:fixed;left:0;top:0;z-index:20;opacity:0;pointer-events:none;background:#c95000;color:#ffffff;font:600 12px/1 Inter;padding:9px 12px;border-radius:8px;box-shadow:0 0 0 1px #ff9933,0 0 30px rgba(255,153,51,.6);white-space:nowrap">Daniela · Sáb 2:00 p. m.</div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Fijada 320 vh. El chat se escribe mensaje por mensaje con el scroll y se desescribe al subir. El paso activo se ilumina (200 ms). En el paso 3 una ficha naranja viaja en arco del celular a la columna de Camila, controlada por el scroll, y la cita se materializa al 86 %. Salida: la sección se libera y sube.</div></sc-if>
+  </div>
+</section>
+
+<!-- 4 EL BOT -->
+<section id="el-bot" data-screen-label="04 El bot" style="position:relative;z-index:2;padding:clamp(96px,11vw,170px) 0 0">
+  <div style="display:grid;grid-template-columns:{{grid.cols}};row-gap:48px">
+    <h2 style="grid-column:{{g.s4h}};margin:0;padding:0 16px 0 12px;font:400 {{g.h2fs}}/1 Geist,sans-serif;letter-spacing:-.04em">Lo que el bot resuelve solo.</h2>
+    <div style="grid-column:1 / -1;display:grid;grid-template-columns:{{grid.cols}};grid-auto-rows:minmax({{g.s4row}},auto)">
+      <sc-for list="{{bento}}" as="c" hint-placeholder-count="4">
+        <div ref="{{c.ref}}" style="grid-column:{{c.gc}};grid-row:{{c.gr}};border:1px solid rgba(255,255,255,.08);margin:-1px 0 0 -1px;background:rgba(14,14,14,.82);padding:{{g.s4pad}};display:flex;flex-direction:{{c.dir}};gap:24px;opacity:{{c.o}};transform:{{c.tr}};transition:opacity .7s ease {{c.dl}},transform .8s cubic-bezier(.16,1,.3,1) {{c.dl}}">
+          <div style="flex:{{c.tf}};display:flex;flex-direction:column;gap:10px"><div style="font:400 {{c.fs}}/1.05 Geist,sans-serif;letter-spacing:-.03em;max-width:16ch">{{c.title}}</div><div style="font:15px/1.5 Inter;color:#999999;max-width:36ch">{{c.sub}}</div></div>
+          <div style="flex:1;min-height:{{c.ch}};display:flex;flex-direction:column;background:#0b0b0b;border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)"><div style="width:26px;height:26px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 10px Inter;color:#ff9933">{{c.bi}}</div><div style="font:600 12px Inter">{{c.biz}}</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:12px">
+              <sc-for list="{{c.msgs}}" as="m" hint-placeholder-count="0">
+                <sc-if value="{{m.cl}}"><div style="align-self:flex-end;max-width:82%;background:#2a1b0d;border-radius:12px 12px 3px 12px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#a8998a;text-align:right;margin-top:2px">{{m.time}} <span style="color:#ff9933">✓✓</span></div></div></sc-if>
+                <sc-if value="{{m.bot}}"><div style="align-self:flex-start;max-width:82%;background:#1c1c1c;border-radius:12px 12px 12px 3px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#999;text-align:right;margin-top:2px">{{m.time}}</div></div></sc-if>
+                <sc-if value="{{m.typing}}"><div style="align-self:flex-start;background:#1c1c1c;border-radius:12px;padding:11px 12px;display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .15s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .3s infinite"></span></div></sc-if>
+                <sc-if value="{{m.img}}"><div style="align-self:flex-end;background:#2a1b0d;border-radius:12px 12px 3px 12px;padding:4px;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both"><div style="width:150px;height:92px;border-radius:9px;background:repeating-linear-gradient(135deg,#221710 0 8px,#2b1d12 8px 16px);display:grid;place-items:center;font:11px 'Geist Mono',monospace;color:#c7b6a4">comprobante.jpg</div></div></sc-if>
+                <sc-if value="{{m.sys}}"><div style="align-self:center;background:#151515;border:1px solid rgba(255,153,51,.35);border-radius:8px;padding:6px 10px;font:11.5px/1.4 Inter;text-align:center;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both">{{m.text}}</div></sc-if>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Entrada: las celdas entran escalonadas cada 120 ms, cada una desde un lado distinto (izquierda, arriba, derecha, abajo), 800 ms expo.out. Cada mini chat reproduce su conversación al entrar en pantalla (900 ms por mensaje, con "escribiendo" antes del bot) y se congela al salir.</div></sc-if>
+  </div>
+</section>
+
+<!-- 5 TU PANEL -->
+<section id="tu-panel" ref="{{rS5}}" data-screen-label="05 Tu panel" style="position:relative;z-index:2;height:{{L.s5h}};margin-top:clamp(96px,11vw,170px)">
+  <div style="position:{{L.stk5}};top:0;min-height:{{L.s5min}};display:grid;grid-template-columns:{{grid.cols}};align-content:center;row-gap:28px;box-sizing:border-box;padding:{{L.stkPad}}">
+    <div style="grid-column:{{g.s5l}};padding:0 16px 0 12px;display:flex;flex-direction:column;gap:32px;align-self:center">
+      <h2 style="margin:0;font:400 {{g.h2fs}}/1 Geist,sans-serif;letter-spacing:-.04em;text-wrap:balance">Todo tu negocio en una pantalla.</h2>
+      <sc-if value="{{D}}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{panel}}" as="p" hint-placeholder-count="5"><button onClick="{{p.go}}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:16px 0;border-top:1px solid {{p.bd}};transition:border-color .25s"><span style="font:500 21px/1.2 Geist,sans-serif;letter-spacing:-.02em;color:{{p.tc}};transition:color .2s">{{p.t}}</span><span style="font:15px/1.5 Inter;color:#999999;display:{{p.dd}}">{{p.d}}</span></button></sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{D}}" hint-placeholder-val="{{ true }}">
+      <div style="grid-column:{{g.s5r}};padding:0 12px;display:flex;justify-content:center;align-self:center">
+        <div style="width:{{lap5.w}}px">
+          <div style="border:1px solid rgba(255,255,255,.14);border-radius:16px 16px 4px 4px;padding:9px;background:#050505;box-shadow:0 50px 100px rgba(0,0,0,.7)">
+            <div style="position:relative;width:100%;aspect-ratio:880/550;overflow:hidden;border-radius:7px;background:#0d0d0d">
+              <div style="position:absolute;left:0;top:0;width:880px;height:550px;transform-origin:0 0;transform:scale({{lap5.k}});display:flex;flex-direction:column">
+                <div style="height:34px;flex:none;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px;background:#111111"><span style="width:10px;height:10px;border-radius:50%;border:1.4px solid #666"></span><span style="width:10px;height:10px;border-radius:50%;border:1.4px solid #666"></span><span style="width:18px;height:18px;border-radius:50%;background:#3a2410;color:#ff9933;font:600 9px/18px Inter;text-align:center">S</span></div>
+                <div style="flex:1;display:flex;min-height:0">
+                  <div style="width:160px;flex:none;border-right:1px solid rgba(255,255,255,.07);padding:14px 10px;display:flex;flex-direction:column;gap:2px;background:#101010">
+                    <div style="font:600 13px/1 Geist,sans-serif;padding:2px 8px">NuvelLab</div>
+                    <div style="font:500 8px/1 Inter;letter-spacing:.12em;color:#8a8a8a;padding:4px 8px 12px">PORTAL DE GESTIÓN</div>
+                    <sc-for list="{{nav5}}" as="i" hint-placeholder-count="10"><div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font:500 11px/1 Inter;color:{{i.c}};background:{{i.bg}};transition:background .3s,color .3s"><span style="width:10px;height:10px;border:1.4px solid currentColor;border-radius:3px"></span>{{i.label}}</div></sc-for>
+                    <div style="margin-top:auto;border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:7px 8px;display:flex;justify-content:space-between;font:10px Inter;color:#999">Estado del Bot<span style="color:#ebebeb"><span style="color:#4ade80">●</span> Activo</span></div>
+                  </div>
+                  <div style="flex:1;position:relative;min-width:0">
+                    <!-- S0 Inicio -->
+                    <div style="position:absolute;inset:0;padding:18px 20px;display:flex;flex-direction:column;gap:12px;opacity:{{sc.o0}};transform:{{sc.t0}};transition:opacity .5s ease,transform .6s cubic-bezier(.16,1,.3,1)">
+                      <div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font:600 22px/1 Geist,sans-serif;letter-spacing:-.02em">Hola, Sebastián</div><div style="font:12px Inter;color:#999;margin-top:6px">Jueves, 24 de septiembre</div></div><div style="background:#ff9933;border-radius:7px;padding:7px 11px;font:500 11px/1 Inter;color:#1a0e02">+ Nueva cita</div></div>
+                      <div style="display:flex;gap:12px;flex:1;min-height:0">
+                        <div style="flex:2.1;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;padding:16px;display:flex;flex-direction:column;gap:12px">
+                          <div style="display:flex;gap:18px"><div style="flex:1"><div style="font:500 9px Inter;letter-spacing:.12em;color:#999">CAJA HOY</div><div style="font:600 34px/1.1 Geist,sans-serif;letter-spacing:-.03em;margin-top:4px">$ {{cajaTxt}}</div><div style="font:11px/1.8 Inter;color:#ccc;margin-top:6px"><span style="color:#4ade80">●</span> $ 2.185.000 ingresos<br><span style="color:#f87171">●</span> $ 50.000 egresos</div></div><div style="flex:1;border-left:1px solid rgba(255,255,255,.08);padding-left:16px"><div style="font:500 9px Inter;letter-spacing:.12em;color:#999">INGRESO ESPERADO HOY</div><div style="font:600 24px/1.2 Geist,sans-serif;margin-top:4px">$ 360.000</div><div style="font:10.5px/1.4 Inter;color:#999;margin-top:4px">Lo que entra a caja si se atienden las 3 citas de hoy</div></div></div>
+                          <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:10px;flex:1;display:flex;flex-direction:column"><div style="font:500 9px Inter;letter-spacing:.12em;color:#999">NETO DE CAJA · ÚLTIMOS 14 DÍAS</div><svg viewBox="0 0 400 110" preserveAspectRatio="none" style="flex:1;width:100%;margin-top:8px"><polyline points="0,40 31,95 62,92 92,86 123,94 154,86 185,82 215,94 246,76 277,94 308,58 338,68 369,88 400,8" fill="none" stroke="#ff9933" stroke-width="2" vector-effect="non-scaling-stroke"></polyline></svg><div style="display:flex;justify-content:space-between;font:10px Inter;color:#8a8a8a"><span>11 sep</span><span>Hoy</span></div></div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+                          <div style="border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;padding:14px"><div style="font:500 9px Inter;letter-spacing:.12em;color:#999">MAÑANA</div><div style="font:600 28px/1.1 Geist,sans-serif">4 <span style="font:400 12px Inter;color:#999">citas</span></div><div style="font:11px/1.7 Inter;color:#ccc"><span style="color:#ff9933">●</span> Primera 8:30 a. m.<br><span style="color:#ff9933">●</span> 4 por confirmar</div></div>
+                          <div style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;padding:14px;display:flex;flex-direction:column;gap:8px"><div style="font:500 9px Inter;letter-spacing:.12em;color:#999">HOY · 3 CITAS</div><sc-for list="{{today}}" as="t" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;font:11px/1.3 Inter;border-top:1px solid rgba(255,255,255,.06);padding-top:7px"><div><div style="font-weight:600">{{t.name}}</div><div style="color:#999">{{t.svc}}</div></div><div style="color:#999">{{t.time}}</div></div></sc-for></div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- S1 Agenda -->
+                    <div style="position:absolute;inset:0;padding:16px 20px;display:flex;flex-direction:column;gap:12px;opacity:{{sc.o1}};transform:{{sc.t1}};transition:opacity .5s ease,transform .6s cubic-bezier(.16,1,.3,1)">
+                      <div style="display:flex;justify-content:space-between;align-items:center"><div style="font:600 22px/1 Geist,sans-serif;letter-spacing:-.02em">Citas</div><div style="background:#ff9933;border-radius:7px;padding:7px 11px;font:500 11px/1 Inter;color:#1a0e02">+ Nueva cita</div></div>
+                      <div style="display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:5px;background:#121212;font:500 11px/1 Inter"><div style="display:flex;background:#1a1a1a;border-radius:99px;padding:2px"><span style="background:#ff9933;color:#1a0e02;border-radius:99px;padding:5px 10px">Día</span><span style="color:#999;padding:5px 10px">Semana</span></div><span>Hoy <span style="color:#999">Jueves, 24 de septiembre</span></span><span style="flex:1"></span><div style="display:flex;background:#1a1a1a;border-radius:99px;padding:2px"><span style="color:#999;padding:5px 10px">Lista</span><span style="background:#ff9933;color:#1a0e02;border-radius:99px;padding:5px 10px">Calendario</span></div></div>
+                      <div style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#101010;overflow:hidden;display:flex;flex-direction:column">
+                        <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.08);flex:none"><div style="width:70px;flex:none"></div><sc-for list="{{pA.cols}}" as="c" hint-placeholder-count="3"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-left:1px solid rgba(255,255,255,.06)"><div style="width:24px;height:24px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 9px Inter">{{c.ini}}</div><div style="font:500 11px Inter">{{c.name}}</div></div></sc-for></div>
+                        <div style="position:relative;flex:1">
+                          <sc-for list="{{pA.hours}}" as="h" hint-placeholder-count="5"><div style="position:absolute;left:0;right:0;top:{{h.top}}px;border-top:1px solid rgba(255,255,255,.06)"><div style="width:62px;text-align:right;font:10px Inter;color:#8a8a8a;transform:translateY(-6px);padding-right:6px">{{h.label}}</div></div></sc-for>
+                          <div style="position:absolute;left:70px;right:0;top:0;bottom:0">
+                            <sc-for list="{{pA.blocks}}" as="b" hint-placeholder-count="4"><div style="position:absolute;left:{{b.left}}px;top:{{b.top}}px;width:{{b.w}}px;height:{{b.h}}px;box-sizing:border-box;background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:5px 7px;overflow:hidden;font:10px/1.35 Inter"><div style="font-weight:600">{{b.name}}</div><div style="color:#999">{{b.svc}}</div><div style="color:#8a8a8a">{{b.time}}</div></div></sc-for>
+                            <div style="position:absolute;left:{{pA.t.left}}px;top:{{pA.t.top}}px;width:{{pA.t.w}}px;height:{{pA.t.h}}px;box-sizing:border-box;border-radius:6px;padding:5px 7px;font:10px/1.35 Inter;background:rgba(255,153,51,.14);border:1px solid #ff9933">{{pA.t.name}}<div>{{pA.t.svc}}</div></div>
+                            <div style="position:absolute;left:4px;top:8px;width:195px;height:56px;box-sizing:border-box;border-radius:6px;padding:5px 7px;font:10px/1.35 Inter;background:#232323;border:1px dashed rgba(255,255,255,.35);animation:nlDrag 5s cubic-bezier(.65,0,.35,1) infinite;box-shadow:0 12px 24px rgba(0,0,0,.5)"><div style="font-weight:600">Mariana Ríos</div><div style="color:#999">Facial hidratante</div><div style="position:absolute;right:18px;bottom:-6px;width:12px;height:12px;border-radius:50%;background:#ebebeb;border:2px solid #0a0a0a"></div></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- S2 Caja -->
+                    <div style="position:absolute;inset:0;padding:18px 20px;display:flex;flex-direction:column;gap:12px;opacity:{{sc.o2}};transform:{{sc.t2}};transition:opacity .5s ease,transform .6s cubic-bezier(.16,1,.3,1)">
+                      <div style="display:flex;justify-content:space-between;align-items:flex-end"><div><div style="font:600 22px/1 Geist,sans-serif;letter-spacing:-.02em">Cierre de Caja Diaria</div><div style="font:12px Inter;color:#999;margin-top:6px">Ingresos y egresos del negocio, día por día.</div></div><div style="display:flex;gap:6px;font:500 10.5px/1 Inter"><span style="border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 9px">+ Ingreso</span><span style="border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 9px">+ Egreso</span><span style="border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 9px">Cerrar el día</span></div></div>
+                      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+                        <div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:12px"><div style="font:500 9px Inter;letter-spacing:.1em;color:#999">INGRESOS</div><div style="font:600 17px Inter;color:#4ade80;margin-top:4px">$ {{ingTxt}}</div></div>
+                        <div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:12px"><div style="font:500 9px Inter;letter-spacing:.1em;color:#999">EGRESOS</div><div style="font:600 17px Inter;color:#f87171;margin-top:4px">$ 50.000</div></div>
+                        <div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:12px"><div style="font:500 9px Inter;letter-spacing:.1em;color:#999">NETO</div><div style="font:600 17px Inter;margin-top:4px">$ {{netoTxt}}</div></div>
+                      </div>
+                      <div style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#101010;overflow:hidden;font:11px/1.3 Inter">
+                        <div style="display:grid;grid-template-columns:80px 1.2fr 1.6fr 100px;padding:9px 14px;font:500 9px Inter;letter-spacing:.1em;color:#999;background:#141414"><span>HORA</span><span>MOVIMIENTO</span><span>CLIENTE / CATEGORÍA</span><span style="text-align:right">MONTO</span></div>
+                        <sc-if value="{{cajaNew}}"><div style="display:grid;grid-template-columns:80px 1.2fr 1.6fr 100px;padding:9px 14px;border-top:1px solid rgba(255,255,255,.06);background:rgba(255,153,51,.08);animation:nlRise .6s cubic-bezier(.16,1,.3,1) both"><span style="color:#999">3:12 p. m.</span><span>Abono de cita</span><span>Laura Restrepo<br><span style="color:#999">Masaje relajante</span></span><span style="text-align:right;color:#4ade80">+$ 30.000</span></div></sc-if>
+                        <sc-for list="{{cajaRows}}" as="r" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:80px 1.2fr 1.6fr 100px;padding:9px 14px;border-top:1px solid rgba(255,255,255,.06)"><span style="color:#999">{{r.h}}</span><span>{{r.m}}</span><span>{{r.c}}<br><span style="color:#999">{{r.k}}</span></span><span style="text-align:right;color:{{r.col}}">{{r.v}}</span></div></sc-for>
+                      </div>
+                    </div>
+                    <!-- S3 Anticipos -->
+                    <div style="position:absolute;inset:0;padding:18px 20px;display:flex;flex-direction:column;gap:14px;opacity:{{sc.o3}};transform:{{sc.t3}};transition:opacity .5s ease,transform .6s cubic-bezier(.16,1,.3,1)">
+                      <div><div style="font:600 22px/1 Geist,sans-serif;letter-spacing:-.02em">Anticipos por verificar</div><div style="font:12px Inter;color:#999;margin-top:6px">Comprobantes que tus clientes enviaron por WhatsApp.</div></div>
+                      <div style="flex:1;display:flex;gap:12px;min-height:0">
+                        <div style="width:220px;display:flex;flex-direction:column;gap:8px">
+                          <div style="border:1px solid #ff9933;border-radius:10px;background:#1a140e;padding:11px;font:11px/1.4 Inter"><div style="display:flex;justify-content:space-between;font-weight:600"><span>Laura Restrepo</span><span>$ 30.000</span></div><div style="color:#999">Masaje relajante · Vie 3:00 p. m.</div></div>
+                          <div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:11px;font:11px/1.4 Inter"><div style="display:flex;justify-content:space-between;font-weight:600"><span>Andrés Gómez</span><span>$ 15.000</span></div><div style="color:#999">Corte + barba · Sáb 11:00 a. m.</div></div>
+                        </div>
+                        <div style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;padding:14px;display:flex;gap:14px">
+                          <div style="width:200px;border-radius:8px;background:repeating-linear-gradient(135deg,#171717 0 8px,#1c1c1c 8px 16px);display:grid;place-items:center;font:11px 'Geist Mono',monospace;color:#999;text-align:center;padding:10px">comprobante de transferencia</div>
+                          <div style="flex:1;display:flex;flex-direction:column;gap:10px;font:12px/1.4 Inter">
+                            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 15px Inter">Laura Restrepo</span><span style="font:500 10px Inter;padding:4px 8px;border-radius:99px;background:{{ant.bg}};color:{{ant.c}}">{{ant.badge}}</span></div>
+                            <div style="display:grid;grid-template-columns:90px 1fr;row-gap:8px;color:#ebebeb"><span style="color:#999">Servicio</span><span>Masaje relajante</span><span style="color:#999">Cita</span><span>Viernes 25, 3:00 p. m.</span><span style="color:#999">Con</span><span>Camila Ortiz</span><span style="color:#999">Anticipo</span><span style="font-weight:600">$ 30.000</span><span style="color:#999">Recibido</span><span>9:43 p. m. por WhatsApp</span></div>
+                            <div style="margin-top:auto;display:flex;gap:8px;justify-content:flex-end;position:relative"><span style="border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 12px;font:500 11px Inter">Rechazar</span><span style="border-radius:7px;padding:8px 12px;font:500 11px Inter;background:{{ant.btnBg}};color:{{ant.btnC}};transition:background .25s">{{ant.btn}}</span>
+                              <sc-if value="{{sc.is3}}"><div style="position:absolute;right:30px;bottom:-4px;width:12px;height:12px;border-radius:50%;background:#ebebeb;border:2px solid #0a0a0a;animation:nlCurIn 1.8s cubic-bezier(.65,0,.35,1) both"></div></sc-if>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- S4 Clientes -->
+                    <div style="position:absolute;inset:0;padding:18px 20px;display:flex;flex-direction:column;gap:12px;opacity:{{sc.o4}};transform:{{sc.t4}};transition:opacity .5s ease,transform .6s cubic-bezier(.16,1,.3,1)">
+                      <div style="display:flex;justify-content:space-between;align-items:center"><div style="font:600 22px/1 Geist,sans-serif;letter-spacing:-.02em">Clientes</div><div style="width:220px;border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 10px;font:11px Inter;color:#8a8a8a">Buscar por nombre o teléfono</div></div>
+                      <div style="flex:1;display:flex;gap:12px;min-height:0">
+                        <div style="flex:1.4;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#101010;overflow:hidden;font:11px/1.3 Inter">
+                          <div style="display:grid;grid-template-columns:1.4fr 1.2fr 50px 90px;padding:9px 12px;font:500 9px Inter;letter-spacing:.1em;color:#999;background:#141414"><span>NOMBRE</span><span>TELÉFONO</span><span>CITAS</span><span>ÚLTIMA</span></div>
+                          <sc-for list="{{clients}}" as="c" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:1.4fr 1.2fr 50px 90px;padding:9px 12px;border-top:1px solid rgba(255,255,255,.06);background:{{c.bg}}"><span style="font-weight:500">{{c.n}}</span><span style="color:#999">{{c.p}}</span><span>{{c.k}}</span><span style="color:#999">{{c.l}}</span></div></sc-for>
+                        </div>
+                        <div style="flex:1;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:14px;display:flex;flex-direction:column;gap:10px;font:11px/1.4 Inter">
+                          <div style="font:600 15px Inter">Laura Restrepo</div><div style="color:#999">+57 310 482 1937 · 12 citas</div>
+                          <div style="font:500 9px Inter;letter-spacing:.1em;color:#999;margin-top:4px">HISTORIAL</div>
+                          <sc-for list="{{history}}" as="h" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.06);padding-top:8px;animation:nlRise .5s cubic-bezier(.16,1,.3,1) {{h.dl}} both"><div><div style="font-weight:500">{{h.s}}</div><div style="color:#999">{{h.d}} · {{h.w}}</div></div><div>{{h.v}}</div></div></sc-for>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="height:13px;margin:0 -5%;background:#161616;border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 12px 12px"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{M}}" hint-placeholder-val="{{ false }}">
+      <div style="grid-column:1 / -1;display:flex;justify-content:center">
+        <div style="width:252px;height:513px">
+          <div style="width:280px;height:570px;transform:scale(.9);transform-origin:0 0;box-sizing:border-box;border-radius:44px;border:1px solid rgba(255,255,255,.16);background:#050505;padding:8px">
+            <div style="width:100%;height:100%;border-radius:36px;overflow:hidden;background:#0a0a0a;display:flex;flex-direction:column">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px 10px;border-bottom:1px solid rgba(255,255,255,.07);font:600 12px Inter"><span>☰</span><span style="width:20px;height:20px;border-radius:50%;background:#3a2410;color:#ff9933;font:600 9px/20px Inter;text-align:center">S</span></div>
+              <div style="flex:1;padding:14px 14px;display:flex;flex-direction:column;gap:10px;font:11px/1.35 Inter;overflow:hidden">
+                <div style="font:600 19px/1.1 Geist,sans-serif;letter-spacing:-.02em">{{mob.title}}</div>
+                <sc-if value="{{mob.is0}}"><div style="border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;padding:12px"><div style="font:500 9px Inter;letter-spacing:.1em;color:#999">CAJA HOY</div><div style="font:600 26px/1.2 Geist,sans-serif">$ {{cajaTxt}}</div><div style="color:#ccc"><span style="color:#4ade80">●</span> $ 2.185.000 ingresos</div></div><sc-for list="{{today}}" as="t" hint-placeholder-count="3"><div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:10px;display:flex;justify-content:space-between"><div><div style="font-weight:600">{{t.name}}</div><div style="color:#999">{{t.svc}}</div></div><span style="color:#999">{{t.time}}</span></div></sc-for></sc-if>
+                <sc-if value="{{mob.is1}}"><div style="border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;overflow:hidden"><div style="display:flex;justify-content:space-between;padding:10px 12px;font-weight:600"><span>Camila Ortiz</span><span style="color:#999;font-weight:400">3 citas ⌃</span></div><div style="padding:0 10px 10px;display:flex;flex-direction:column;gap:6px"><div style="background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px"><b>Mariana Ríos</b><div style="color:#999">Facial hidratante · 1:00 p. m.</div></div><div style="background:rgba(255,153,51,.14);border:1px solid #ff9933;border-radius:8px;padding:8px"><b>Laura Restrepo</b><div>Masaje relajante · 3:00 p. m.</div></div><div style="background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px"><b>Isabel Duque</b><div style="color:#999">Masaje relajante · 4:30 p. m.</div></div></div></div><div style="border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;padding:10px 12px;display:flex;justify-content:space-between;font-weight:600">Sara Londoño<span style="color:#999;font-weight:400">2 citas ⌄</span></div><div style="border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#141414;padding:10px 12px;display:flex;justify-content:space-between;font-weight:600">Paula Vélez<span style="color:#999;font-weight:400">1 cita ⌄</span></div></sc-if>
+                <sc-if value="{{mob.is2}}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:10px"><div style="font:500 9px Inter;color:#999">INGRESOS</div><div style="color:#4ade80;font-weight:600">$ {{ingTxt}}</div></div><div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:10px"><div style="font:500 9px Inter;color:#999">NETO</div><div style="font-weight:600">$ {{netoTxt}}</div></div></div><sc-if value="{{cajaNew}}"><div style="border:1px solid #ff9933;border-radius:10px;background:#1a140e;padding:10px;display:flex;justify-content:space-between;animation:nlRise .6s both"><div>Abono de cita<div style="color:#999">Laura Restrepo</div></div><span style="color:#4ade80">+$ 30.000</span></div></sc-if><sc-for list="{{cajaRows}}" as="r" hint-placeholder-count="4"><div style="border-top:1px solid rgba(255,255,255,.06);padding:8px 2px;display:flex;justify-content:space-between"><div>{{r.m}}<div style="color:#999">{{r.c}}</div></div><span style="color:{{r.col}}">{{r.v}}</span></div></sc-for></sc-if>
+                <sc-if value="{{mob.is3}}"><div style="height:150px;border-radius:10px;background:repeating-linear-gradient(135deg,#171717 0 8px,#1c1c1c 8px 16px);display:grid;place-items:center;font:10px 'Geist Mono',monospace;color:#999">comprobante de transferencia</div><div style="font-weight:600;font-size:13px">Laura Restrepo · $ 30.000</div><div style="color:#999">Masaje relajante · Viernes 25, 3:00 p. m.</div><div style="margin-top:6px;text-align:center;border-radius:8px;padding:10px;font-weight:600;background:{{ant.btnBg}};color:{{ant.btnC}}">{{ant.btn}}</div></sc-if>
+                <sc-if value="{{mob.is4}}"><sc-for list="{{clients}}" as="c" hint-placeholder-count="6"><div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#141414;padding:9px 10px;display:flex;justify-content:space-between"><div><div style="font-weight:600">{{c.n}}</div><div style="color:#999">{{c.p}}</div></div><span style="color:#999">{{c.k}} citas</span></div></sc-for></sc-if>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div onScroll="{{onCar}}" style="grid-column:1 / -1;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px 8px;scrollbar-width:none">
+        <sc-for list="{{panel}}" as="p" hint-placeholder-count="5"><button onClick="{{p.pick}}" style="all:unset;cursor:pointer;flex:0 0 78%;scroll-snap-align:center;box-sizing:border-box;border:1px solid {{p.cbd}};background:#121212;padding:18px;display:flex;flex-direction:column;gap:8px"><span style="font:500 20px/1.2 Geist,sans-serif;color:{{p.tc}}">{{p.t}}</span><span style="font:15px/1.5 Inter;color:#999999">{{p.d}}</span></button></sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Fijada 5 tramos de 80 vh. El ítem activo se ilumina y la pantalla cambia con fundido y 12 px de desplazamiento (500 ms). UI viva: la caja cuenta hasta $ 2.135.000, un cursor arrastra una cita a otra columna, entra un abono y el total sube, el cursor aprueba el anticipo, el historial entra escalonado. Clic en un ítem lleva a su tramo. Móvil: carrusel con snap que cambia la pantalla del celular.</div></sc-if>
+  </div>
+</section>
+
+<!-- 6 NEGOCIOS -->
+<section id="negocios" ref="{{rS6}}" data-screen-label="06 Negocios" style="position:relative;z-index:2;padding:clamp(96px,11vw,170px) 0 0">
+  <div style="display:grid;grid-template-columns:{{grid.cols}};row-gap:40px">
+    <h2 style="grid-column:{{g.s6h}};margin:0;padding:0 16px 0 12px;font:400 {{g.h2fs}}/1 Geist,sans-serif;letter-spacing:-.04em;text-wrap:balance">Hecho para negocios que viven de las citas.</h2>
+    <div style="grid-column:{{g.s6tabs}};align-self:end;display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 12px;scrollbar-width:none">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.go}}" style="all:unset;cursor:pointer;flex:none;scroll-snap-align:start;padding:11px 16px;border:1px solid {{t.bd}};border-radius:{{g.tabR}};font:500 15px/1 Inter;color:{{t.c}};background:{{t.bg}};transition:all .2s ease">{{t.label}}</button></sc-for>
+    </div>
+    <div style="grid-column:{{g.s6p}};display:flex;justify-content:center;padding:0 12px">
+      <div style="width:252px;height:513px">
+        <div style="width:280px;height:570px;transform:scale(.9);transform-origin:0 0;box-sizing:border-box;border-radius:44px;border:1px solid rgba(255,255,255,.16);background:#050505;padding:8px">
+          <div style="width:100%;height:100%;border-radius:36px;overflow:hidden;background:#0c0c0c;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;padding:14px 24px 6px;font:600 12px Inter"><span>9:41</span><span style="width:18px;height:9px;border:1px solid #ebebeb;border-radius:3px"></span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)"><span style="color:#999;font:20px/1 Inter">‹</span><div style="width:32px;height:32px;border-radius:50%;background:#1f1f1f;display:grid;place-items:center;font:600 11px Inter;color:#ff9933">{{tn.bi}}</div><div><div style="font:600 13px Inter">{{tn.biz}}</div><div style="font:11px Inter;color:#999">{{s6Status}}</div></div></div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:12px 10px;overflow:hidden">
+              <sc-for list="{{msgs6}}" as="m" hint-placeholder-count="0">
+                <sc-if value="{{m.cl}}"><div style="align-self:flex-end;max-width:82%;background:#2a1b0d;border-radius:12px 12px 3px 12px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#a8998a;text-align:right;margin-top:2px">{{m.time}} <span style="color:#ff9933">✓✓</span></div></div></sc-if>
+                <sc-if value="{{m.bot}}"><div style="align-self:flex-start;max-width:82%;background:#1c1c1c;border-radius:12px 12px 12px 3px;padding:7px 10px 5px;font:13px/1.38 Inter;animation:nlPop .4s cubic-bezier(.16,1,.3,1) both">{{m.text}}<div style="font-size:10px;color:#999;text-align:right;margin-top:2px">{{m.time}}</div></div></sc-if>
+                <sc-if value="{{m.typing}}"><div style="align-self:flex-start;background:#1c1c1c;border-radius:12px;padding:11px 12px;display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .15s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#999;animation:nlDot 1s .3s infinite"></span></div></sc-if>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:8px;padding:8px 10px 16px;align-items:center"><div style="flex:1;background:#1a1a1a;border-radius:99px;padding:9px 14px;font:12px Inter;color:#8a8a8a">Mensaje</div><div style="width:32px;height:32px;border-radius:50%;background:#1f1f1f"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="grid-column:{{g.s6s}};padding:0 16px 0 12px;display:flex;flex-direction:column;justify-content:center">
+      <sc-for list="{{svcs}}" as="v" hint-placeholder-count="3"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:26px 0;border-top:1px solid rgba(255,255,255,.1);opacity:{{v.o}};transform:{{v.tr}};transition:opacity .45s ease {{v.dl}},transform .6s cubic-bezier(.16,1,.3,1) {{v.dl}}"><div><div style="font:400 {{g.svcfs}}/1.1 Geist,sans-serif;letter-spacing:-.03em">{{v.n}}</div><div style="font:15px Inter;color:#999999;margin-top:6px">{{v.d}}</div></div><div style="font:400 {{g.svcfs}}/1 Geist,sans-serif;letter-spacing:-.03em;color:#ff9933;flex:none">{{v.p}}</div></div></sc-for>
+    </div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Entrada: al llegar a pantalla el chat del spa se escribe solo. Interacción: al cambiar de pestaña los servicios salen (220 ms), el chat se borra y se reescribe mensaje por mensaje (600 ms) y los 3 servicios entran escalonados cada 90 ms. Móvil: pastillas con scroll horizontal y snap.</div></sc-if>
+  </div>
+</section>
+
+<!-- 7 HECHOS -->
+<section ref="{{rStats}}" data-screen-label="07 Lo que cambia" style="position:relative;z-index:2;padding:clamp(110px,12vw,190px) 0 0">
+  <div style="display:grid;grid-template-columns:{{grid.cols}};row-gap:{{g.s7gap}}">
+    <h2 style="grid-column:{{g.s7h}};margin:0;padding:0 16px 0 12px;font:400 {{g.h2fs}}/1 Geist,sans-serif;letter-spacing:-.04em">Lo que pasa cuando el bot contesta.</h2>
+    <sc-for list="{{facts}}" as="f" hint-placeholder-count="3">
+      <div style="grid-column:{{f.gc}};display:flex;flex-direction:{{f.dir}};align-items:{{f.ai}};gap:{{f.gap}};padding:0 16px 0 12px;position:relative">
+        <div style="position:relative;flex:none;max-width:100%">
+          <sc-for list="{{f.dots}}" as="d" hint-placeholder-count="0"><span style="position:absolute;left:50%;top:50%;width:{{d.s}}px;height:{{d.s}}px;border-radius:50%;background:{{d.c}};opacity:{{d.o}};transform:{{d.tr}};transition:transform 1.1s cubic-bezier(.16,1,.3,1) {{d.dl}},opacity .9s ease {{d.dl}};pointer-events:none"></span></sc-for>
+          <div style="overflow:{{f.ov}};position:relative;padding:.1em .12em .16em 0"><div style="font:400 {{f.fs}}/1 Geist,sans-serif;letter-spacing:-.06em;white-space:{{f.ws}};transform:{{f.tr}};transition:transform 1s cubic-bezier(.16,1,.3,1) .15s">{{f.v}}</div></div>
+        </div>
+        <p style="margin:0;font:400 19px/1.5 Inter;color:#999999;max-width:30ch;padding-bottom:.6em">{{f.line}}</p>
+      </div>
+    </sc-for>
+    <div style="grid-column:1 / -1;display:grid;grid-template-columns:{{g.trust}};border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)">
+      <sc-for list="{{trust}}" as="t" hint-placeholder-count="3"><div style="padding:24px 16px 24px 12px;border-left:1px solid rgba(255,255,255,.08);font:500 16px/1.45 Inter;color:#ebebeb;margin-left:-1px">{{t}}</div></sc-for>
+    </div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Entrada una sola vez al 25 % visible: los puntos se reúnen detrás de cada pieza (1,1 s), "24" y "2 a 3" cuentan hacia arriba (1,3 s) y "Tu mismo número" se revela por máscara. Las tres piezas comparten el mismo tratamiento (cifra grande + línea) para cambiarlas luego por métricas reales sin rediseñar.</div></sc-if>
+  </div>
+</section>
+
+<!-- 8 CÓMO EMPEZAMOS -->
+<section ref="{{rS8}}" data-screen-label="08 Cómo empezamos" style="position:relative;z-index:2;padding:clamp(110px,12vw,190px) 0 0">
+  <div style="display:grid;grid-template-columns:{{grid.cols}};row-gap:56px">
+    <h2 style="grid-column:{{g.s8h}};margin:0;padding:0 16px 0 12px;font:400 {{g.h2fs}}/1 Geist,sans-serif;letter-spacing:-.04em">De la demo a tu bot en vivo.</h2>
+    <div style="grid-column:1 / -1;position:relative;display:grid;grid-template-columns:{{g.s8cols}}">
+      <div style="position:absolute;left:{{g.s8lineL}};top:0;width:{{g.s8lineW}};height:{{g.s8lineH}};background:rgba(255,255,255,.1)"></div>
+      <div style="position:absolute;left:{{g.s8lineL}};top:0;width:{{g.s8lineW}};height:{{g.s8lineH}};background:#ff9933;transform:{{s8.tr}};transform-origin:0 0;transition:transform .1s linear"></div>
+      <sc-for list="{{steps8}}" as="s" hint-placeholder-count="3"><div style="grid-column:{{s.gc}};position:relative;padding:{{g.s8pad}};display:flex;flex-direction:column;gap:10px"><span style="position:absolute;left:{{g.s8dotL}};top:{{g.s8dotT}};width:11px;height:11px;background:{{s.dot}};border:1px solid {{s.dotB}};transition:background .2s ease;box-shadow:{{s.sh}}"></span><div style="font:500 15px/1 Geist,sans-serif;color:{{s.nc}};transition:color .2s">{{s.n}}</div><div style="font:400 28px/1.1 Geist,sans-serif;letter-spacing:-.03em;color:{{s.tc}};transition:color .2s">{{s.t}}</div><div style="font:16px/1.55 Inter;color:#999999;max-width:30ch">{{s.d}}</div></div></sc-for>
+    </div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>La línea naranja se dibuja ligada al scroll (scaleX, sin fijar la sección) y cada paso se enciende cuando la línea llega a su nodo (200 ms). Móvil: la línea es vertical (scaleY).</div></sc-if>
+  </div>
+</section>
+
+<!-- 9 FAQ -->
+<section id="preguntas" data-screen-label="09 Preguntas" style="position:relative;z-index:2;padding:clamp(110px,12vw,190px) 0 0">
+  <div style="display:grid;grid-template-columns:{{grid.cols}};row-gap:40px">
+    <h2 style="grid-column:{{g.s9h}};margin:0;padding:0 16px 0 12px;font:400 {{g.h2fs}}/1 Geist,sans-serif;letter-spacing:-.04em;align-self:start">Preguntas frecuentes.</h2>
+    <div style="grid-column:{{g.s9l}};padding:0 16px 0 12px;border-bottom:1px solid rgba(255,255,255,.1)">
+      <sc-for list="{{faq}}" as="q" hint-placeholder-count="6"><div style="border-top:1px solid rgba(255,255,255,.1)"><button onClick="{{q.go}}" style="all:unset;cursor:pointer;box-sizing:border-box;width:100%;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 0;font:400 {{g.faqfs}}/1.25 Geist,sans-serif;letter-spacing:-.02em;color:#ebebeb"><span>{{q.q}}</span><span style="flex:none;font:300 28px/1 Geist,sans-serif;color:#ff9933;transform:{{q.rot}};transition:transform .25s ease">+</span></button><div style="display:grid;grid-template-rows:{{q.rows}};transition:grid-template-rows .3s cubic-bezier(.16,1,.3,1)"><div style="overflow:hidden"><p style="margin:0 0 24px;font:17px/1.55 Inter;color:#999999;max-width:52ch">{{q.a}}</p></div></div></div></sc-for>
+    </div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Acordeón de uno abierto a la vez (300 ms); el + gira 45°. Sin entrada animada: aquí se viene a leer.</div></sc-if>
+  </div>
+</section>
+
+<!-- 10 CTA + FOOTER -->
+<section ref="{{rFin}}" data-screen-label="10 CTA final" style="position:relative;z-index:2;padding:clamp(120px,14vw,220px) 0 0">
+  <h2 style="margin:0;display:grid;grid-template-columns:{{grid.cols}};font-family:Geist,sans-serif;font-weight:400;font-size:{{hv.fs}};line-height:.95;letter-spacing:-.055em">
+    <div style="grid-column:{{hv.w1}};overflow:hidden;padding:0 0 .06em 12px"><div style="transform:{{fin.t1}};transition:transform .9s cubic-bezier(.16,1,.3,1)">Cada mensaje</div></div>
+    <div style="grid-column:{{hv.w2}};overflow:hidden;padding:0 0 .06em 12px"><div style="transform:{{fin.t2}};transition:transform .9s cubic-bezier(.16,1,.3,1) .12s">se vuelve</div></div>
+    <div style="grid-column:{{hv.w3}};overflow:hidden;padding:0 0 .06em 12px"><div style="transform:{{fin.t3}};transition:transform .9s cubic-bezier(.16,1,.3,1) .24s">una cita.</div></div>
+  </h2>
+  <div style="display:grid;grid-template-columns:{{grid.cols}};margin-top:56px;row-gap:40px">
+    <div style="grid-column:{{g.finCard}};padding:0 12px;display:flex;justify-content:{{g.finJ}}">
+      <div style="position:relative;width:300px">
+        <sc-for list="{{finDots}}" as="d" hint-placeholder-count="0"><span style="position:absolute;left:{{d.x}}px;top:{{d.y}}px;width:3px;height:3px;border-radius:50%;background:{{d.c}};opacity:{{d.o}};transform:{{d.tr}};transition:transform 1.2s cubic-bezier(.16,1,.3,1) {{d.dl}},opacity 1s ease {{d.dl}}"></span></sc-for>
+        <div style="border:1px solid #ff9933;background:rgba(255,153,51,.1);border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;opacity:{{fin.cardO}};box-shadow:{{fin.cardSh}};transition:opacity .6s ease 1s,box-shadow 1.4s ease 1.2s"><div><div style="font:600 14px Inter">Laura Restrepo</div><div style="font:13px Inter;color:#ebebeb">Masaje relajante con Camila</div></div><div style="font:500 13px Inter;text-align:right">Mañana<br>3:00 p. m.</div></div>
+      </div>
+    </div>
+    <div style="grid-column:{{g.finCta}};padding:0 12px;display:flex;justify-content:{{g.finJ2}};align-items:center">
+      <a href="{{wa}}" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;background:#c95000;color:#ffffff;font:500 {{g.finFs}}/1 'Geist Mono',monospace;letter-spacing:.12em;padding:28px 34px;border-radius:2px;width:{{g.finW}};box-sizing:border-box" style-hover="color:#ffffff;background:#b84800">[ AGENDA UNA DEMO → ]</a>
+    </div>
+    <sc-if value="{{showNotes}}" hint-placeholder-val="{{ true }}"><div style="grid-column:{{g.note}};margin:0 12px;border:1px dashed rgba(255,153,51,.45);padding:10px 12px;font:italic 12px/1.5 Inter;color:#b3b3b3;max-width:560px"><span style="font-style:normal;font-weight:600;color:#ff9933">Nota · </span>Espejo del hero: el titular vuelve por máscara (120 ms entre bloques), los puntos se reúnen en el contorno de una cita (1,2 s) y la cita se enciende en naranja. Hover del CTA: el fondo se oscurece (150 ms).</div></sc-if>
+  </div>
+  <footer style="margin-top:clamp(100px,10vw,160px);border-top:1px solid rgba(255,255,255,.1);display:grid;grid-template-columns:{{grid.cols}};row-gap:32px;padding:40px 0 48px">
+    <div style="grid-column:{{g.f1}};padding:0 12px;display:flex;flex-direction:column;gap:12px"><span style="font:500 24px/1 Geist,sans-serif;letter-spacing:-.03em">Nuvel<span style="color:#ff9933">Lab</span></span><span style="font:14px/1.5 Inter;color:#999999">© 2026 NuvelLab. Hecho en Colombia.</span></div>
+    <nav style="grid-column:{{g.f2}};padding:0 12px;display:flex;flex-direction:column;gap:12px;font:400 12px/1.2 'Geist Mono',monospace;letter-spacing:.14em">
+      <sc-for list="{{navLinks}}" as="l" hint-placeholder-count="5"><a href="{{l.href}}" style="color:#999999" style-hover="color:#ebebeb">{{l.label}}</a></sc-for>
+    </nav>
+    <div style="grid-column:{{g.f3}};padding:0 12px;display:flex;flex-direction:column;gap:12px;font:15px/1.4 Inter"><a href="https://wa.me/573178605783" target="_blank" style="color:#ebebeb">WhatsApp +57 317 860 5783</a><a href="#" style="color:#999999">Política de tratamiento de datos</a><a href="https://app.nuvellab.cloud" style="color:#999999">Ingresar al panel</a></div>
+  </footer>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;En vivo&quot;,&quot;Primer frame&quot;,&quot;Fin de entrada&quot;,&quot;La cita llega&quot;,&quot;Salida (inicio del scroll)&quot;,&quot;Plan B (estático)&quot;],&quot;default&quot;:&quot;En vivo&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Anotaciones&quot;}}">
+const WA='https://wa.me/573178605783?text=Hola%2C%20quiero%20agendar%20una%20demo%20de%20NuvelLab';
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ez=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const cop=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const hl=h=>{const hh=Math.floor(h),m=Math.round((h-hh)*60),ap=hh>=12?'p. m.':'a. m.',h12=((hh+11)%12)+1;return h12+':'+String(m).padStart(2,'0')+' '+ap;};
+const ini=n=>n.replace(/^Dra?\.\s/,'').split(' ').map(s=>s[0]).slice(0,2).join('');
+const rng=seed=>()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+
+const NICHES=[
+{tab:'Spas',biz:'Spa Aurora',bi:'SA',client:'Laura Restrepo',service:'Masaje relajante',price:'$85.000',hour:15,durH:1,col:0,date:'Viernes, 25 de septiembre',
+ workers:['Camila Ortiz','Sara Londoño','Paula Vélez'],
+ msgs:[['c','Hola, ¿tienen cita mañana a las 3?','9:41 p. m.'],['b','¡Hola Laura! Mañana tenemos libre a las 2:00, 3:00 y 4:30 p. m. ¿Cuál te sirve?','9:41 p. m.'],['c','La de las 3 porfa, masaje relajante 🙏','9:42 p. m.'],['b','Listo Laura, quedaste agendada mañana a las 3:00 p. m. para Masaje relajante con Camila.','9:42 p. m.']],
+ busy:[[0,-2,1,'Mariana Ríos','Facial hidratante'],[1,-1,1.5,'Juliana Toro','Masaje con piedras'],[2,.5,1,'Natalia Gil','Exfoliación corporal'],[0,1.5,1,'Isabel Duque','Masaje relajante']],
+ services:[['Masaje relajante','60 minutos','$85.000'],['Facial hidratante','45 minutos','$70.000'],['Exfoliación corporal','50 minutos','$95.000']]},
+{tab:'Barberías',biz:'Barbería Distrito',bi:'BD',client:'Andrés Gómez',service:'Corte + barba',price:'$35.000',hour:17,durH:.75,col:1,date:'Jueves, 24 de septiembre',
+ workers:['Mateo Rojas','Julián Castaño','Kevin Arango'],
+ msgs:[['c','Buenas, ¿me pueden atender hoy para corte y barba?','1:15 p. m.'],['b','¡Hola Andrés! Hoy Julián tiene libre a las 4:30, 5:00 y 6:00 p. m.','1:15 p. m.'],['c','A las 5 me queda perfecto','1:16 p. m.'],['b','Listo Andrés, quedaste agendado hoy a las 5:00 p. m. para Corte + barba con Julián.','1:16 p. m.']],
+ busy:[[0,-1.5,.5,'Santiago Mora','Corte clásico'],[1,-1,.75,'Felipe Niño','Corte + barba'],[2,0,1,'Juan Pablo Ríos','Corte + diseño'],[1,1.5,.5,'Cristian López','Arreglo de barba']],
+ services:[['Corte + barba','45 minutos','$35.000'],['Corte clásico','30 minutos','$25.000'],['Arreglo de barba','20 minutos','$15.000']]},
+{tab:'Peluquerías caninas',biz:'Patitas Spa Canino',bi:'PS',client:'Luna · Daniela Muñoz',service:'Baño y corte raza mediana',price:'$60.000',hour:10,durH:1.5,col:2,date:'Sábado, 26 de septiembre',
+ workers:['Tomás Ruiz','Laura Cano','Valentina Herrera'],
+ msgs:[['c','Hola, ¿tienen espacio el sábado para bañar y motilar a Luna? 🐶','7:58 a. m.'],['b','¡Hola Daniela! El sábado tenemos libre a las 9:00, 10:00 y 11:30 a. m.','7:58 a. m.'],['c','A las 10 porfa','7:59 a. m.'],['b','Listo Daniela, Luna quedó agendada el sábado a las 10:00 a. m. para Baño y corte raza mediana con Valentina.','7:59 a. m.']],
+ busy:[[0,-2,1,'Kira','Baño raza pequeña'],[1,-1,1.5,'Rocco','Baño y corte'],[2,-2,1.5,'Toby','Deslanado'],[0,1,1,'Max','Corte de uñas']],
+ services:[['Baño y corte raza mediana','90 minutos','$60.000'],['Baño raza pequeña','60 minutos','$40.000'],['Corte de uñas','15 minutos','$15.000']]},
+{tab:'Clínicas',biz:'Clínica Dermavida',bi:'CD',client:'Carlos Mejía',service:'Valoración inicial',price:'$80.000',hour:16,durH:.5,col:0,date:'Jueves, 1 de octubre',
+ workers:['Dra. Natalia Ortiz','Dr. Felipe Salazar','Dra. Ana Cárdenas'],
+ msgs:[['c','Buenas tardes, quiero una valoración. ¿Hay algo el jueves?','5:20 p. m.'],['b','¡Hola Carlos! El jueves hay espacio a las 8:00 a. m., 11:00 a. m. y 4:00 p. m.','5:20 p. m.'],['c','A las 4 p. m.','5:21 p. m.'],['b','Listo Carlos, quedaste agendado el jueves a las 4:00 p. m. para Valoración inicial con la Dra. Ortiz.','5:21 p. m.']],
+ busy:[[0,-1.5,1,'Marta Cifuentes','Limpieza facial'],[1,-1,.5,'Jorge Pineda','Control'],[2,0,1,'Lucía Arango','Limpieza facial profunda'],[1,.5,.5,'Ana María Soto','Valoración inicial']],
+ services:[['Valoración inicial','30 minutos','$80.000'],['Limpieza facial profunda','60 minutos','$120.000'],['Control','20 minutos','$50.000']]}];
+const HOWN=Object.assign({},NICHES[0],{client:'Daniela Muñoz',hour:14,date:'Sábado, 26 de septiembre'});
+const HOW=[['c','Hola, ¿me puedes agendar un masaje para el sábado?','11:48 p. m.'],['typing'],['b','Hola Daniela. El sábado Camila tiene libre a las 10:00 a. m. y a las 2:00 p. m.','11:48 p. m.'],['c','A las 2 porfa 🙏','11:49 p. m.'],['typing'],['b','Listo Daniela, quedaste agendada el sábado a las 2:00 p. m. para Masaje relajante con Camila. Valor: $85.000.','11:49 p. m.']];
+const HOWT=[.04,.16,.26,.4,.5,.58];
+const NOTIFS=[['Valentina','¿Hay cupo hoy?','11:02 p. m.'],['Juan Pablo','¿Cuánto vale el corte?','11:02 p. m.'],['Laura R.','Necesito mover mi cita del jueves','11:03 p. m.'],['Sofía','Holaaa ¿siguen abiertos?','11:03 p. m.'],['Diego A.','¿Atienden domingos?','11:03 p. m.'],['Mariana','¿Tienen algo a las 6?','11:03 p. m.'],['Carlos M.','Buenas, ¿cuánto dura el masaje?','11:04 p. m.'],['Paula','¿Me pueden atender ya?','11:04 p. m.'],['Andrés G.','Quiero cancelar lo de mañana 😕','11:04 p. m.'],['Natalia','¿Dónde quedan?','11:04 p. m.'],['Felipe','¿El sábado hay espacio?','11:04 p. m.'],['Isabel','Hola??','11:04 p. m.'],['Tomás','¿Todavía hay cita para hoy?','11:04 p. m.'],['Camilo','¿Hacen facial?','11:04 p. m.']];
+const BENTO=[
+ {title:'Agenda, cancela y reagenda.',sub:'Tu cliente pide mover su cita y el bot le ofrece otro horario libre, sin que tú intervengas.',biz:'Barbería Distrito',bi:'BD',
+  script:[['c','Hola, no voy a poder ir el jueves a las 4 😓 ¿la puedo mover?','8:12 a. m.'],['typing'],['b','Claro Andrés. Julián tiene libre el viernes a las 4:00 p. m. o el sábado a las 11:00 a. m.','8:12 a. m.'],['c','El viernes a las 4','8:13 a. m.'],['typing'],['b','Listo, tu cita quedó para el viernes a las 4:00 p. m. Ya liberé el espacio del jueves.','8:13 a. m.'],['sys','Cita movida en tu panel: jueves 4:00 p. m. → viernes 4:00 p. m.']]},
+ {title:'Responde precios y duración.',sub:'Con los servicios y precios que tú configuras.',biz:'Spa Aurora',bi:'SA',
+  script:[['c','¿Cuánto vale el masaje relajante?','3:30 p. m.'],['typing'],['b','El masaje relajante cuesta $85.000 y dura 60 minutos. ¿Te agendo uno?','3:30 p. m.']]},
+ {title:'Pide el anticipo y tú lo apruebas.',sub:'El cliente envía la foto del comprobante y tú lo apruebas desde el panel.',biz:'Spa Aurora',bi:'SA',
+  script:[['b','Para separar tu cita necesitamos un anticipo de $30.000. Envíanos el comprobante por aquí.','9:40 p. m.'],['img'],['typing'],['b','Recibido, Laura. Apenas lo verifiquen te confirmo.','9:43 p. m.'],['sys','Anticipo de $30.000 aprobado desde tu panel']]},
+ {title:'Te pasa la conversación cuando no sabe.',sub:'Si la pregunta se sale de lo común, el bot no inventa: avisa y te la pasa.',biz:'Spa Aurora',bi:'SA',
+  script:[['c','¿Hacen masajes a domicilio para una despedida de 12 personas?','6:05 p. m.'],['typing'],['b','Buena pregunta. Ya le paso tu mensaje al equipo.','6:05 p. m.'],['sys','Conversación transferida a ti']]}];
+const PANEL=[['Tu día de un vistazo.','Inicio con la caja del día como tarjeta principal y las citas de hoy.','Inicio'],['Agenda por trabajador.','Columnas por persona y bloques de cita por hora.','Citas'],['Caja diaria.','Ingresos y egresos del día, con el total que sube cuando entra un abono.','Caja Diaria'],['Anticipos por verificar.','El comprobante que envió el cliente y el botón para aprobarlo.','Pagos'],['Tus clientes.','Historial de citas de cada cliente.','Clientes']];
+const NAVI=['Inicio','Citas','Clientes','Caja Diaria','Bonos','Pagos','Servicios','Equipo','Analíticas','Configuración'];
+const STEPS8=[['Hablas con un asesor.','Te mostramos NuvelLab con ejemplos de tu tipo de negocio.'],['Configuramos tu negocio.','Servicios, precios, horarios y tu equipo.'],['Tu bot empieza a contestar.','Y tú lo ves todo desde tu panel.']];
+const FAQ=[['¿Cuánto cuesta?','Depende de tu negocio. Lo definimos contigo en la demo.'],['¿Qué pasa si el bot no sabe responder algo?','Te pasa la conversación para que respondas tú, sin que el cliente quede esperando.'],['¿Funciona si tengo varios trabajadores?','Sí. Cada trabajador tiene su propia agenda y el bot solo ofrece los horarios en que está libre.'],['¿Dónde quedan mis datos y los de mis clientes?','Protegidos según la Ley 1581, y los de tu negocio nunca se mezclan con los de otro.'],['¿Tengo que cambiar mi número de WhatsApp?','No. El bot contesta desde el mismo número que tus clientes ya conocen.'],['¿Cuánto tarda en estar listo?','Entre 2 y 3 días, mientras conectamos tu número a la API oficial de WhatsApp.']];
+const CAJA=[['2:05 p. m.','Pago de cita','Juliana Toro','Masaje con piedras','+$ 120.000',1],['12:40 p. m.','Pago de cita','Natalia Gil','Exfoliación corporal','+$ 95.000',1],['11:10 a. m.','Venta de bono','Isabel Duque','Bono AEFV-MJ7U','+$ 150.000',1],['10:30 a. m.','Compra de insumos','Egreso','Aceites y toallas','-$ 50.000',0],['9:29 a. m.','Pago de cita','Mariana Ríos','Facial hidratante','+$ 70.000',1]];
+const CLIENTS=[['Laura Restrepo','+57 310 482 1937','12','24 sep'],['Andrés Gómez','+57 315 220 6614','8','19 sep'],['Daniela Muñoz','+57 301 774 0582','5','12 sep'],['Carlos Mejía','+57 318 905 3321','3','2 sep'],['Mariana Ríos','+57 312 640 1198','9','24 sep'],['Juliana Toro','+57 300 118 4476','6','24 sep']];
+const HIST=[['Masaje relajante','24 sep','Camila','$85.000'],['Facial hidratante','30 ago','Sara','$70.000'],['Masaje relajante','2 ago','Camila','$85.000'],['Exfoliación corporal','5 jul','Paula','$95.000']];
+
+function agenda(n,RH,colsW){
+ const start=Math.floor(n.hour)-2,colW=colsW/n.workers.length,T=h=>(h-start)*RH+8;
+ return {date:n.date,
+  hours:[0,1,2,3,4].map(i=>({label:hl(start+i),top:i*RH+8})),
+  cols:n.workers.map((w,i)=>({name:w,ini:ini(w),left:i*colW})),
+  blocks:n.busy.map(b=>({left:b[0]*colW+4,w:colW-8,top:T(n.hour+b[1])+2,h:b[2]*RH-4,name:b[3],svc:b[4],time:hl(n.hour+b[1])})),
+  t:{left:n.col*colW+4,w:colW-8,top:T(n.hour)+2,h:Math.max(26,n.durH*RH-4),name:n.client,svc:n.service,price:n.price},
+  tcol:{name:n.workers[n.col],ini:ini(n.workers[n.col])}};
+}
+function vis(script,n){return script.slice(0,n).filter((x,i)=>x[0]!=='typing'||i===n-1).map((x,i)=>({k:i,cl:x[0]==='c',bot:x[0]==='b',typing:x[0]==='typing',sys:x[0]==='sys',img:x[0]==='img',text:x[1]||'',time:x[2]||''}));}
+function nscript(n){const m=n.msgs;return [m[0],['typing'],m[1],m[2],['typing'],m[3]];}
+function perim(r,u){const P=2*(r.width+r.height);let d=u*P;if(d<r.width)return[r.left+d,r.top];d-=r.width;if(d<r.height)return[r.right,r.top+d];d-=r.height;if(d<r.width)return[r.right-d,r.bottom];d-=r.width;return[r.left,r.bottom-d];}
+
+class Component extends DCLogic {
+ state={w:window.innerWidth,vh:window.innerHeight,introT:0,step:0,niche:0,landed:false,glow:false,navC:false,menu:false,p2:0,p3:0,p8:0,a5:0,caja:0,ing:2155000,cajaNew:false,approved:false,bN:[0,0,0,0],bIn:[false,false,false,false],tab:0,tabN:0,svcShow:false,faq:0,statC:0,statsIn:false,finIn:false};
+ rHero=React.createRef();rCanvas=React.createRef();rSpot=React.createRef();rDev=React.createRef();rLap=React.createRef();rPhone=React.createRef();rTarget=React.createRef();rBubble=React.createRef();
+ rS2=React.createRef();rS3=React.createRef();rS5=React.createRef();rS6=React.createRef();rS8=React.createRef();rTok=React.createRef();rB3=React.createRef();rT3D=React.createRef();rT3M=React.createRef();rStats=React.createRef();rFin=React.createRef();
+ rBen=[React.createRef(),React.createRef(),React.createRef(),React.createRef()];
+ timers=[];bT=[0,0,0,0];pT=[];rafs={};mx=-999;my=-999;rx=0;ry=0;heroE=0;fadeAll=1;S=[];
+ constructor(p){super(p);const R=rng(7);
+  this.spill=NOTIFS.map(()=>({x:(R()-.5)*300,y:R()*50,r:(R()-.5)*26}));
+  this.sdots=[0,1,2].map(()=>Array.from({length:22},()=>({sx:(R()-.5)*1000,sy:(R()-.5)*500,tx:(R()-.5)*220,ty:(R()-.5)*120,s:1.5+R()*2.5,or:R()<.45})));
+  this.fdots=Array.from({length:60},(_,i)=>{const u=i/60,p=perim({left:0,top:0,right:300,bottom:70,width:300,height:70},u);return {x:p[0],y:p[1],sx:(R()-.5)*900,sy:(R()-.5)*500,or:R()<.6,dl:R()*.4};});
+ }
+ frozen(){const m=this.props.heroState||'En vivo';const k=this.rm&&m==='En vivo'?'Plan B (estático)':m;
+  return ({'Primer frame':{introT:150,step:0,landed:false,e:0},'Fin de entrada':{introT:2600,step:0,landed:false,e:0},'La cita llega':{introT:9999,step:6,landed:false,e:0,sp:.62},'Salida (inicio del scroll)':{introT:9999,step:6,landed:true,e:.28},'Plan B (estático)':{introT:9999,step:6,landed:true,e:0,still:true}})[k]||null;}
+ still(){const f=this.frozen();return !!(f&&f.still);}
+ T(f,d){this.timers.push(setTimeout(f,d));}
+ componentDidMount(){
+  this.rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  this.onResize=()=>{const M0=this.state.w<820;this.setState({w:innerWidth,vh:innerHeight});if(M0!==(innerWidth<820))this.initP();this.measure();};
+  this.onScroll=()=>{if(this.sq)return;this.sq=requestAnimationFrame(()=>{this.sq=0;this.measure();});};
+  this.onMouse=e=>{this.mx=e.clientX;this.my=e.clientY;const s=this.rSpot.current;if(s){const g=`radial-gradient(220px circle at ${e.clientX}px ${e.clientY}px,#000,transparent 70%)`;s.style.maskImage=g;s.style.webkitMaskImage=g;}};
+  addEventListener('resize',this.onResize);addEventListener('scroll',this.onScroll,{passive:true});addEventListener('mousemove',this.onMouse);
+  this.initP();this.start();this.raf=requestAnimationFrame(this.tick);
+  this.io=new IntersectionObserver(this.onIO,{threshold:[0,.25]});
+  [...this.rBen,this.rS6,this.rStats,this.rFin].forEach(r=>r.current&&this.io.observe(r.current));
+  if(this.still()){this.setState({bN:BENTO.map(b=>b.script.length),bIn:[true,true,true,true],statsIn:true,statC:1,finIn:true,tabN:6,svcShow:true,caja:2135000,ing:2185000,cajaNew:true,approved:true});}
+  else this.onPanel(0);
+  setTimeout(()=>this.measure(),50);
+ }
+ componentDidUpdate(pp){if(pp.heroState!==this.props.heroState){this.start();this.measure();}}
+ componentWillUnmount(){removeEventListener('resize',this.onResize);removeEventListener('scroll',this.onScroll);removeEventListener('mousemove',this.onMouse);cancelAnimationFrame(this.raf);this.timers.forEach(clearTimeout);this.bT.forEach(clearInterval);clearInterval(this.tabI);this.io&&this.io.disconnect();}
+ start(){this.timers.forEach(clearTimeout);this.timers=[];this.S=[];
+  const fr=this.frozen();
+  if(fr){this.setState({step:fr.step,landed:fr.landed,glow:false,niche:0,introT:fr.introT});if(fr.sp!=null)this.spawnStream();return;}
+  this.t0=performance.now();this.setState({introT:0,step:0,landed:false,glow:false,niche:0});
+  [50,300,800,950,1100,2000,2150,2600].forEach(t=>this.T(()=>this.setState({introT:t}),t));
+  this.T(()=>this.runCycle(),2600);
+ }
+ runCycle(){[[500,1],[1300,2],[2300,3],[3400,4],[4100,5],[4900,6]].forEach(([d,st])=>this.T(()=>{this.setState({step:st});if(st===6){this.spawnStream();this.T(()=>{this.setState({landed:true,glow:true});this.T(()=>this.setState({glow:false}),1400);},1150);}},d));
+  this.T(()=>{this.setState(s=>({niche:(s.niche+1)%4,step:0,landed:false,glow:false}));this.runCycle();},8800);}
+ spawnStream(){const n=innerWidth<820?40:90;this.S=Array.from({length:n},()=>({d:Math.random()*.4,j1:(Math.random()-.5)*90,j2:(Math.random()-.5)*90,z:.5+Math.random()*.8}));this.sT0=performance.now();}
+ initP(){const M=innerWidth<820,N=M?180:720,R=rng(3);const g=()=>{let u=0,v=0;while(!u)u=R();while(!v)v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+  this.P=Array.from({length:N},()=>({u:R(),dev:R()<.6?0:1,ol:R()<.7,cx:g()*.42,cy:g()*.42,z:.3+R()*.7,or:R()<.3,ph:R()*6.28,sp:.4+R()*.9,ox:0,oy:0,vx:0,vy:0,fx:R(),fy:R()}));}
+ tick=(now)=>{this.raf=requestAnimationFrame(this.tick);
+  const c=this.rCanvas.current;if(!c||!this.P)return;
+  const W=innerWidth,H=innerHeight,dpr=Math.min(2,devicePixelRatio||1),M=W<820;
+  if(c.width!==Math.round(W*dpr)||c.height!==Math.round(H*dpr)){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);}
+  const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+  const fr=this.frozen(),still=!!(fr&&fr.still);
+  const T=fr?fr.introT:now-this.t0,tm=still?0:now/1000,e=Math.max(fr?fr.e:0,this.heroE);
+  const dv=this.rDev.current;
+  if(dv){let tx=0,ty=0;if(M){tx=clamp(scrollY*.03,0,9);ty=-3;}else if(!still&&this.mx>-900){ty=clamp((this.mx/W-.5)*16,-8,8);tx=clamp(-(this.my/H-.5)*12,-8,8);}
+   this.rx+=(tx-this.rx)*.07;this.ry+=(ty-this.ry)*.07;
+   dv.style.transform=`translateY(${-e*160}px) rotateX(${this.rx}deg) rotateY(${this.ry}deg)`;dv.style.opacity=String(1-clamp((e-.08)*1.5));}
+  c.style.opacity=String(this.fadeAll);if(this.fadeAll<=0.001)return;
+  const L=this.rLap.current,Ph=this.rPhone.current;if(!L||!Ph)return;
+  const rs=[L.getBoundingClientRect(),Ph.getBoundingClientRect()];
+  const l=Math.min(rs[0].left,rs[1].left),r=Math.max(rs[0].right,rs[1].right),t=Math.min(rs[0].top,rs[1].top),b=Math.max(rs[0].bottom,rs[1].bottom);
+  const cx=(l+r)/2,cy=(t+b)/2,span=r-l;
+  const appear=clamp((T-400)/600),cond=ez(clamp((T-1100)/900)),es=ez(clamp(e*1.25));
+  for(const p of this.P){
+   const dx=Math.sin(tm*p.sp+p.ph)*7*p.z,dy=Math.cos(tm*p.sp*.8+p.ph)*6*p.z;
+   let X=cx+p.cx*span,Y=cy+p.cy*span*.6;
+   if(p.ol){const q=perim(rs[p.dev],p.u);X+=(q[0]-X)*cond;Y+=(q[1]-Y)*cond;}
+   const dm=p.ol?1-cond*.6:2.4;X+=dx*dm;Y+=dy*dm;
+   if(es>0){const fx=W*p.fx+dx*5,fy=H*p.fy+dy*5;X+=(fx-X)*es;Y+=(fy-Y)*es;}
+   if(!M&&!still){const ddx=X+p.ox-this.mx,ddy=Y+p.oy-this.my,d=Math.hypot(ddx,ddy);if(d<130&&d>.1){const f=(130-d)/130*1.6;p.vx+=ddx/d*f;p.vy+=ddy/d*f;}}
+   p.vx+=-p.ox*.05;p.vy+=-p.oy*.05;p.vx*=.86;p.vy*=.86;p.ox+=p.vx;p.oy+=p.vy;
+   x.globalAlpha=appear*(p.ol?(.22+.5*p.z)*(1-cond*.3):(.12+.35*p.z));x.fillStyle=p.or?'#ff9933':'#ebebeb';
+   x.beginPath();x.arc(X+p.ox,Y+p.oy,.5+1.3*p.z,0,6.283);x.fill();}
+  if(this.S.length){const B=this.rBubble.current,Tg=this.rTarget.current;
+   if(B&&Tg){const bb=B.getBoundingClientRect(),tt=Tg.getBoundingClientRect();
+    const fx=bb.left+bb.width*.3,fy=bb.bottom-40,tx=tt.left+tt.width/2,ty=tt.top+tt.height/2;
+    const g=fr&&fr.sp!=null?fr.sp:(now-this.sT0)/1100;let alive=false;x.fillStyle='#ff9933';
+    for(const s of this.S){const q=clamp(g*1.4-s.d);if(q<1)alive=true;if(q<=0||q>=1)continue;
+     const k=ez(q),mx=(fx+tx)/2+s.j1,my=Math.min(fy,ty)-150+s.j2;
+     const X=(1-k)*(1-k)*fx+2*(1-k)*k*mx+k*k*tx,Y=(1-k)*(1-k)*fy+2*(1-k)*k*my+k*k*ty;
+     x.globalAlpha=.16;x.beginPath();x.arc(X,Y,5*s.z,0,6.283);x.fill();x.globalAlpha=.95;x.beginPath();x.arc(X,Y,1.5*s.z+.4,0,6.283);x.fill();}
+    if(!alive&&!fr)this.S=[];}}
+  x.globalAlpha=1;
+ };
+ measure(){const y=scrollY,vh=innerHeight,up={},st=this.still(),s=this.state,M=innerWidth<820;
+  const h=this.rHero.current;if(h)this.heroE=clamp(y/(h.offsetHeight*.8));
+  if((y>30)!==s.navC)up.navC=y>30;
+  const sp=this.rSpot.current;if(sp){const cell=innerWidth/(M?4:12);sp.style.backgroundPosition=`${-cell/2}px ${-cell/2-y}px`;}
+  const pr=r=>{const el=r.current;if(!el)return 0;const b=el.getBoundingClientRect();return clamp(-b.top/Math.max(1,b.height-vh));};
+  const p2=st?1:Math.round(pr(this.rS2)*200)/200;if(p2!==s.p2)up.p2=p2;
+  const p3=st?1:Math.round(pr(this.rS3)*200)/200;if(p3!==s.p3)up.p3=p3;
+  if(!st&&!M){const a=Math.min(4,Math.floor(pr(this.rS5)*5));if(a!==s.a5){up.a5=a;this.onPanel(a);}}
+  const e8=this.rS8.current;if(e8){const b=e8.getBoundingClientRect();const p8=st?1:Math.round(clamp((vh*.75-b.top)/(b.height*.75))*100)/100;if(p8!==s.p8)up.p8=p8;}
+  const s2=this.rS2.current;if(s2){const b=s2.getBoundingClientRect();this.fadeAll=clamp((b.bottom-vh*.4)/(vh*.5));}
+  const tok=this.rTok.current,B=this.rB3.current,Tg=M?this.rT3M.current:this.rT3D.current;
+  if(tok&&B&&Tg){const t=clamp((p3-.66)/.2);if(t>0&&t<1&&!st){const b=B.getBoundingClientRect(),g=Tg.getBoundingClientRect();const fx=b.left+b.width*.3,fy=b.bottom-50,tx=g.left+g.width/2,ty=g.top+g.height/2,k=ez(t);
+    tok.style.opacity='1';tok.style.transform=`translate(${fx+(tx-fx)*k}px,${fy+(ty-fy)*k-Math.sin(Math.PI*k)*120}px) translate(-50%,-50%) scale(${1-.3*k})`;}else tok.style.opacity='0';}
+  if(Object.keys(up).length)this.setState(up);
+ }
+ anim(k,a,b,d){cancelAnimationFrame(this.rafs[k]);const t0=performance.now();const f=now=>{const t=clamp((now-t0)/d);this.setState({[k]:a+(b-a)*(1-Math.pow(1-t,3))});if(t<1)this.rafs[k]=requestAnimationFrame(f);};this.rafs[k]=requestAnimationFrame(f);}
+ onPanel(i){this.pT.forEach(clearTimeout);this.pT=[];
+  if(i===0)this.anim('caja',0,2135000,1300);
+  if(i===2){cancelAnimationFrame(this.rafs.ing);this.setState({cajaNew:false,ing:2155000});this.pT.push(setTimeout(()=>{this.setState({cajaNew:true});this.anim('ing',2155000,2185000,900);},1100));}
+  if(i===3){this.setState({approved:false});this.pT.push(setTimeout(()=>this.setState({approved:true}),1500));}}
+ onIO=(entries)=>{for(const en of entries){const el=en.target;const bi=this.rBen.findIndex(r=>r.current===el);const vis=en.isIntersecting&&en.intersectionRatio>=.25;
+  if(bi>=0){if(vis){if(!this.state.bIn[bi]){const bIn=this.state.bIn.slice();bIn[bi]=true;this.setState({bIn});}this.startB(bi);}else if(!en.isIntersecting)this.stopB(bi);}
+  else if(el===this.rS6.current&&vis&&!this.s6p){this.s6p=true;this.playTab(0);}
+  else if(el===this.rStats.current&&vis&&!this.state.statsIn){this.setState({statsIn:true});this.anim('statC',0,1,1300);}
+  else if(el===this.rFin.current&&en.isIntersecting&&en.intersectionRatio>=.25&&!this.state.finIn)this.setState({finIn:true});}};
+ startB(i){if(this.bT[i]||this.still())return;this.bT[i]=setInterval(()=>{const n=this.state.bN[i];if(n>=BENTO[i].script.length){this.stopB(i);return;}const bN=this.state.bN.slice();bN[i]=n+1;this.setState({bN});},900);}
+ stopB(i){clearInterval(this.bT[i]);this.bT[i]=0;}
+ playTab(i){clearInterval(this.tabI);this.setState({svcShow:false});setTimeout(()=>{this.setState({tab:i,tabN:0,svcShow:true});this.tabI=setInterval(()=>{if(this.state.tabN>=6){clearInterval(this.tabI);return;}this.setState(s=>({tabN:s.tabN+1}));},600);},230);}
+ goPanel(i){if(this.still()||innerWidth<820){this.setState({a5:i});this.onPanel(i);return;}const el=this.rS5.current;if(!el)return;const top=el.getBoundingClientRect().top+scrollY;scrollTo({top:top+(i+.5)/5*(el.offsetHeight-innerHeight),behavior:'smooth'});}
+ renderVals(){
+  const s=this.state,W=s.w,vh=s.vh,M=W<820,D=!M,cols=M?4:12,cell=W/cols;
+  const fr=this.frozen(),st=this.still();
+  const T=fr?fr.introT:s.introT,step=fr?fr.step:s.step,landed=fr?fr.landed:s.landed,glow=fr?false:s.glow;
+  const n=NICHES[fr?0:s.niche];
+  const svg=col=>`url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${cell}' height='${cell}'><path d='M${cell/2-5} ${cell/2}h10M${cell/2} ${cell/2-5}v10' stroke='${col}' stroke-width='1' fill='none'/></svg>`)}")`;
+  const grid={size:`${cell}px ${cell}px`,cpos:`${-cell/2}px ${-cell/2}px`,cross:svg('rgba(255,255,255,0.22)'),spot:svg('rgba(255,178,110,0.95)'),co:T>=50?1:0,lo:T>=300?1:0,spotO:M||st?0:1,cols:`repeat(${cols},minmax(0,1fr))`};
+  const devScale=clamp(Math.min(W/1440,(vh-40)/900),.6,1.2);
+  const wt=i=>T>=800+i*150?'translateY(0)':'translateY(105%)';
+  const hv={fs:M?'15vw':'min(9.4vw,16vh)',w1:M?'1 / -1':'1 / span 9',w2:M?'1 / -1':'7 / span 6',w3:M?'1 / -1':'1 / span 7',t1:wt(0),t2:wt(1),t3:wt(2),
+   subO:T>=2150?1:0,subT:T>=2150?'none':'translateY(16px)',scr:T>=2000?1:0,subC:M?'1 / -1':'1 / span 4',subM:M?'24px':'4vh',
+   pos:M?'relative':'absolute',right:M?'auto':`${cell*.5}px`,bottom:M?'auto':'4vh',w:M?'100%':'780px',h:M?'470px':'500px',tr:M?'none':`scale(${devScale})`,devM:M?'36px':'0',
+   phL:M?'8px':'auto',phR:M?'auto':'0px',phTr:M?'none':'rotateY(-14deg) rotateX(4deg) translateZ(60px)',pad:M?'92px 0 32px':'100px 0 0',minH:M?'auto':'max(100vh,680px)',
+   notePos:'relative',noteW:M?'none':'min(460px,42vw)',noteM:M?'24px 12px 0':'40px 12px 32px'};
+  const hA=agenda(n,60,610);
+  const hC={ini:hA.tcol.ini,name:hA.tcol.name,rows:[-1,0,1].map((o,i)=>({label:hl(n.hour+o),top:i*40}))};
+  const hT={o:landed?1:0,sh:glow?'0 0 0 1px #ff9933,0 0 30px rgba(255,153,51,.65)':'0 0 0 0 rgba(255,153,51,0)',tr:landed?'scale(1)':'scale(.9)'};
+  const heroMsgs=vis(nscript(n),Math.min(6,step));
+  const navFor=a=>NAVI.map(l=>({label:l,c:l===a?'#ff9933':'#b3b3b3',bg:l===a?'rgba(255,153,51,.12)':'transparent'}));
+  // s2
+  const p2=st?1:s.p2,k2=clamp(p2/.78),nv=Math.round(14*Math.pow(k2,1.7)),ordered=p2>=.84;
+  const notifs=NOTIFS.map((x,i)=>({i,name:x[0],text:x[1],time:x[2]})).slice(0,ordered?14:nv).reverse().map((x,j)=>{const sp=this.spill[x.i],f=ordered?0:clamp((j-5)/4);return Object.assign(x,{tr:`translate(${sp.x*f}px,${sp.y*f}px) rotate(${sp.r*f}deg)`,full:!ordered,done:ordered});});
+  const k2p=M?Math.min((W-32)/280,(vh-330)/570,1.2):Math.min(1.05,(vh-140)/570);
+  // s3
+  const p3=st?1:s.p3,n3=HOWT.filter(t=>p3>=t).length,msgs3=vis(HOW,n3),a3=p3<.2?0:p3<.62?1:2,l3=p3>=.86;
+  const S3=[['Tu cliente escribe cuando quiera.','De día, de noche o en festivo.'],['El bot revisa tu agenda real y agenda.','Solo ofrece horarios en los que el trabajador está libre.'],['La cita aparece en tu panel.','Con el cliente, el servicio, el trabajador y el precio.']];
+  const steps3=S3.map((x,i)=>({n:String(i+1),title:x[0],text:x[1],nc:i===a3?'#ff9933':'#808080',tc:i===a3?'#ebebeb':'#808080',dc:i===a3?'#999999':'#808080',o:1,dd:M&&i!==a3?'none':'block'}));
+  const tA=agenda(HOWN,60,610);
+  const t3={o:l3?1:0,sh:l3?'0 0 0 1px #ff9933,0 0 24px rgba(255,153,51,.45)':'none',tr:l3?'scale(1)':'scale(.9)'};
+  const lap3W=Math.max(360,Math.min(560,cell*8-230-72));
+  const ph3k=M?.62:Math.min(.82,(vh-280)/570);
+  // bento
+  const bpos=D?[['1 / 8','1 / 3'],['8 / 13','1 / 2'],['8 / 13','2 / 4'],['1 / 8','3 / 4']]:[['1 / -1','auto'],['1 / -1','auto'],['1 / -1','auto'],['1 / -1','auto']];
+  const bfrom=['translateX(-60px)','translateY(-50px)','translateX(60px)','translateY(60px)'];
+  const bento=BENTO.map((b,i)=>({ref:this.rBen[i],title:b.title,sub:b.sub,biz:b.biz,bi:b.bi,gc:bpos[i][0],gr:bpos[i][1],msgs:vis(b.script,s.bN[i]),o:s.bIn[i]?1:0,tr:s.bIn[i]?'none':bfrom[i],dl:`${i*.12}s`,fs:i===0&&D?'clamp(34px,3.4vw,50px)':'26px',dir:D&&i===3?'row':'column',tf:D&&i===3?'0 0 40%':'none',ch:i===0?(D?'380px':'340px'):(i===2?'330px':'210px')}));
+  // s5
+  const a5=s.a5;
+  const panel=PANEL.map((p,i)=>({t:p[0],d:p[1],tc:i===a5?'#ebebeb':'#808080',bd:i===a5?'#ff9933':'rgba(255,255,255,.1)',cbd:i===a5?'#ff9933':'rgba(255,255,255,.1)',dd:i===a5?'block':'none',go:()=>this.goPanel(i),pick:()=>{this.setState({a5:i});this.onPanel(i);}}));
+  const sc={};for(let i=0;i<5;i++){sc['o'+i]=i===a5?1:0;sc['t'+i]=i===a5?'none':`translateY(${i<a5?-12:12}px)`;}sc.is3=a5===3;
+  const lap5W=Math.max(520,Math.min(920,cell*8-24));
+  const mob={title:['Hola, Sebastián','Citas','Caja diaria','Anticipo por verificar','Clientes'][a5],is0:a5===0,is1:a5===1,is2:a5===2,is3:a5===3,is4:a5===4};
+  const ant={badge:s.approved?'Aprobado':'Por verificar',bg:s.approved?'rgba(74,222,128,.14)':'rgba(255,153,51,.14)',c:s.approved?'#4ade80':'#ff9933',btn:s.approved?'Aprobado ✓':'Aprobar anticipo',btnBg:s.approved?'#1f2a22':'#ff9933',btnC:s.approved?'#4ade80':'#1a0e02'};
+  // s6
+  const tn=NICHES[s.tab],msgs6=vis(nscript(tn),s.tabN);
+  const tabs=NICHES.map((x,i)=>({label:x.tab,go:()=>{if(i!==s.tab)this.playTab(i);},c:i===s.tab?'#ebebeb':'#999999',bd:i===s.tab?'#ff9933':'rgba(255,255,255,.14)',bg:i===s.tab?'rgba(255,153,51,.1)':'transparent'}));
+  const svcs=tn.services.map((v,i)=>({n:v[0],d:v[1],p:v[2],o:s.svcShow?1:0,tr:s.svcShow?'none':'translateY(14px)',dl:s.svcShow?`${.1+i*.09}s`:'0s'}));
+  // s7
+  const c=s.statC,sin=s.statsIn;
+  const dots=k=>this.sdots[k].map((d,i)=>({s:d.s,c:d.or?'#ff9933':'#ebebeb',o:sin?(d.or?.8:.35):0,tr:sin?`translate(${d.tx}px,${d.ty}px)`:`translate(${d.sx}px,${d.sy}px)`,dl:`${i*.02}s`}));
+  const facts=[
+   {v:`${Math.round(24*c)}/7`,line:'Tus clientes agendan de día, de noche y en festivo.',fs:M?'34vw':'17vw',gc:M?'1 / -1':'1 / -1',dir:M?'column':'row',ai:M?'flex-start':'flex-end',gap:M?'16px':'6vw',ws:'nowrap',tr:'none',ov:'visible',dots:dots(0)},
+   {v:`${Math.max(1,Math.round(2*c))} a ${Math.max(1,Math.round(3*c))} días`,line:'De la demo a tu bot contestando.',fs:M?'14vw':'10.5vw',gc:M?'1 / -1':'3 / -1',dir:M?'column':'row',ai:M?'flex-start':'flex-end',gap:M?'16px':'4vw',ws:'nowrap',tr:'none',ov:'visible',dots:dots(1)},
+   {v:'Tu mismo número',line:'No cambias de WhatsApp ni les avisas nada a tus clientes.',fs:M?'15vw':'8.4vw',gc:'1 / -1',dir:'column',ai:M?'flex-start':'flex-start',gap:'20px',ws:M?'normal':'nowrap',tr:sin?'translateY(0)':'translateY(105%)',ov:'hidden',dots:dots(2)}];
+  // s8
+  const p8=st?1:s.p8;
+  const steps8=STEPS8.map((x,i)=>{const on=p8>=(i===0?.02:i*.5-.02);return {n:String(i+1),t:x[0],d:x[1],gc:D?`${i*4+1} / span 4`:'1 / -1',dot:on?'#ff9933':'#0a0a0a',dotB:on?'#ff9933':'rgba(255,255,255,.3)',sh:on?'0 0 16px rgba(255,153,51,.6)':'none',nc:on?'#ff9933':'#808080',tc:on?'#ebebeb':'#808080'};});
+  const s8={tr:D?`scaleX(${p8})`:`scaleY(${p8})`};
+  // faq
+  const faq=FAQ.map((q,i)=>({q:q[0],a:q[1],rows:s.faq===i?'1fr':'0fr',rot:s.faq===i?'rotate(45deg)':'none',go:()=>this.setState({faq:s.faq===i?-1:i})}));
+  // fin
+  const fi=s.finIn,ft=d=>fi?'translateY(0)':'translateY(105%)';
+  const fin={t1:ft(),t2:ft(),t3:ft(),cardO:fi?1:0,cardSh:fi?'0 0 40px rgba(255,153,51,.35)':'none'};
+  const finDots=this.fdots.map(d=>({x:d.x,y:d.y,c:d.or?'#ff9933':'#ebebeb',o:fi?.9:0,tr:fi?'none':`translate(${d.sx}px,${d.sy}px)`,dl:`${d.dl}s`}));
+  const g={note:'1 / -1',h2fs:M?'38px':'clamp(40px,4.4vw,68px)',
+   s2t:M?'1 / -1':'1 / span 6',s2tr:M?'1':'1',s2p:M?'1 / -1':'8 / span 4',s2pr:M?'2':'1',
+   s3h:M?'1 / -1':'1 / span 8',s3l:M?'1 / -1':'1 / span 4',s3lr:M?'3':'2',s3d:M?'1 / -1':'5 / span 8',s3dr:'2',s3gap:M?'18px':'40px',s3tfs:M?'17px':'22px',s3stepGap:M?'10px':'26px',s3align:M?'flex-end':'center',s3devGap:M?'12px':'28px',
+   s4h:M?'1 / -1':'1 / span 6',s4row:M?'auto':'300px',s4pad:M?'20px 16px':'32px',
+   s5l:M?'1 / -1':'1 / span 4',s5r:'5 / span 8',
+   s6h:M?'1 / -1':'1 / span 6',s6tabs:M?'1 / -1':'7 / span 6',s6p:M?'1 / -1':'1 / span 5',s6s:M?'1 / -1':'6 / span 7',tabR:M?'99px':'2px',svcfs:M?'24px':'clamp(26px,2.6vw,38px)',
+   s7h:M?'1 / -1':'1 / span 6',s7gap:M?'64px':'96px',trust:M?'1fr':'repeat(3,1fr)',
+   s8h:M?'1 / -1':'1 / span 6',s8cols:D?'repeat(12,minmax(0,1fr))':'1fr',s8lineL:D?'12px':'17px',s8lineW:D?'calc(100% - 24px)':'1px',s8lineH:D?'1px':'100%',s8pad:D?'36px 24px 0 12px':'0 16px 44px 48px',s8dotL:D?'7px':'-36px',s8dotT:D?'-5px':'2px',
+   s9h:M?'1 / -1':'1 / span 4',s9l:M?'1 / -1':'6 / span 7',faqfs:M?'20px':'24px',
+   finCard:M?'1 / -1':'1 / span 5',finCta:M?'1 / -1':'7 / span 6',finJ:'flex-start',finJ2:M?'stretch':'flex-end',finFs:M?'15px':'clamp(16px,1.5vw,22px)',finW:M?'100%':'auto',
+   f1:M?'1 / -1':'1 / span 4',f2:M?'1 / -1':'6 / span 3',f3:M?'1 / -1':'9 / span 4'};
+  const L={s2h:st?'auto':(M?'230vh':'260vh'),s3h:st?'auto':(M?'300vh':'320vh'),s5h:st||M?'auto':'500vh',stk:st?'relative':'sticky',stk5:st||M?'relative':'sticky',stkH:st?'auto':'100vh',s5min:M?'auto':'100vh',stkPad:M?'80px 0 24px':'80px 0 32px'};
+  return {D,M,navFull:W>=1180,navMenu:W<1180,grid,hv,hA,hC,hT,hn:n,heroMsgs,hStatus:step===2||step===5?'escribiendo…':'en línea',heroStateLabel:(this.rm&&!this.props.heroState)?'Plan B':(this.props.heroState||'En vivo'),
+   navCitas:navFor('Citas'),nav5:navFor(PANEL[a5][2]),
+   nav:{h:s.navC?'60px':(M?'64px':'72px'),bg:s.navC?'rgba(10,10,10,.72)':'transparent',blur:s.navC?'blur(14px)':'none',bd:s.navC?'rgba(255,255,255,.08)':'transparent',pad:M?'16px':'24px'},
+   navLinks:[['CÓMO FUNCIONA','#como-funciona'],['EL BOT','#el-bot'],['TU PANEL','#tu-panel'],['NEGOCIOS','#negocios'],['PREGUNTAS','#preguntas']].map(x=>({label:x[0],href:x[1]})),
+   menu:s.menu,openMenu:()=>this.setState({menu:true}),closeMenu:()=>this.setState({menu:false}),wa:WA,showNotes:this.props.showNotes!==false,
+   notifs,s2:{gap:ordered?4:8},ph2:{k:k2p,w:280*k2p,h:570*k2p},
+   msgs3,s3Status:msgs3.length&&msgs3[msgs3.length-1].typing?'escribiendo…':'en línea',steps3,tA,t3,tC:{rows:[-1,0,1].map((o,i)=>({label:hl(14+o),top:i*40+12}))},
+   ph3:{k:ph3k,w:280*ph3k,h:570*ph3k},lap3:{w:lap3W,k:(lap3W-18)/880},
+   bento,panel,sc,lap5:{w:lap5W,k:(lap5W-20)/880},mob,ant,pA:agenda(NICHES[0],60,610),
+   cajaTxt:cop(s.caja),ingTxt:cop(s.ing),netoTxt:cop(s.ing-50000),cajaNew:s.cajaNew,
+   cajaRows:CAJA.map(r=>({h:r[0],m:r[1],c:r[2],k:r[3],v:r[4],col:r[5]?'#4ade80':'#f87171'})),
+   today:[['Laura Restrepo','Masaje relajante','3:00 p. m.'],['Natalia Gil','Exfoliación corporal','3:30 p. m.'],['Isabel Duque','Masaje relajante','4:30 p. m.']].map(x=>({name:x[0],svc:x[1],time:x[2]})),
+   clients:CLIENTS.map((x,i)=>({n:x[0],p:x[1],k:x[2],l:x[3],bg:i===0?'rgba(255,153,51,.08)':'transparent'})),
+   history:HIST.map((x,i)=>({s:x[0],d:x[1],w:x[2],v:x[3],dl:`${.2+i*.12}s`})),
+   onCar:e=>{const el=e.currentTarget,f=el.firstElementChild;if(!f)return;const i=clamp(Math.round(el.scrollLeft/(f.offsetWidth+12)),0,4);if(i!==this.state.a5){this.setState({a5:i});this.onPanel(i);}},
+   tn,msgs6,s6Status:msgs6.length&&msgs6[msgs6.length-1].typing?'escribiendo…':'en línea',tabs,svcs,
+   facts,trust:['API oficial de WhatsApp Business','Tus datos protegidos según la Ley 1581 de Colombia','Cada negocio con sus datos aislados'],
+   steps8,s8,faq,fin,finDots,g,L,
+   rHero:this.rHero,rCanvas:this.rCanvas,rSpot:this.rSpot,rDev:this.rDev,rLap:this.rLap,rPhone:this.rPhone,rTarget:this.rTarget,rBubble:this.rBubble,
+   rS2:this.rS2,rS3:this.rS3,rS5:this.rS5,rS6:this.rS6,rS8:this.rS8,rTok:this.rTok,rB3:this.rB3,rT3D:this.rT3D,rT3M:this.rT3M,rStats:this.rStats,rFin:this.rFin};
+ }
+}
+</script>
+</body>
+</html>

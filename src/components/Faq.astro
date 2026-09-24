@@ -1,0 +1,124 @@
+---
+import { FAQ } from '../lib/data';
+---
+
+<section id="preguntas" class="faq">
+  <div class="page-grid faq__grid">
+    <h2 class="section-title faq__title">Preguntas frecuentes.</h2>
+    <div class="faq__list" data-faq>
+      {
+        FAQ.map(([q, a], i) => (
+          <div class:list={['faq__item', { 'is-open': i === 0 }]}>
+            <h3 class="faq__q">
+              <button type="button" aria-expanded={i === 0 ? 'true' : 'false'} aria-controls={`faq-${i}`} data-faq-toggle>
+                <span>{q}</span>
+                <span class="faq__icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="faq__a" id={`faq-${i}`} role="region">
+              <div>
+                <p>{a}</p>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq {
+    position: relative;
+    z-index: 2;
+    padding: clamp(110px, 12vw, 190px) 0 0;
+  }
+  .faq__grid {
+    row-gap: 40px;
+  }
+  .faq__title {
+    grid-column: 1 / span 4;
+    align-self: start;
+  }
+  .faq__list {
+    grid-column: 6 / span 7;
+    padding: 0 16px 0 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .faq__item {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .faq__q {
+    margin: 0;
+  }
+  .faq__q button {
+    all: unset;
+    cursor: pointer;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 0;
+    font: 400 24px/1.25 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  .faq__q button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .faq__icon {
+    flex: none;
+    font: 300 28px/1 var(--font-display);
+    color: var(--accent);
+    transition: transform 0.25s ease;
+  }
+  .is-open .faq__icon {
+    transform: rotate(45deg);
+  }
+  .faq__a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s var(--ease-out);
+  }
+  .is-open .faq__a {
+    grid-template-rows: 1fr;
+  }
+  .faq__a > div {
+    overflow: hidden;
+  }
+  .faq__a p {
+    margin: 0 0 24px;
+    font: 17px/1.55 var(--font-body);
+    color: var(--muted);
+    max-width: 52ch;
+  }
+
+  @media (max-width: 819.98px) {
+    .faq__title,
+    .faq__list {
+      grid-column: 1 / -1;
+    }
+    .faq__q button {
+      font-size: 20px;
+    }
+  }
+</style>
+
+<script>
+  // One question open at a time; works independently of the motion system.
+  const list = document.querySelector<HTMLElement>('[data-faq]');
+  list?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-faq-toggle]');
+    if (!btn) return;
+    const item = btn.closest('.faq__item');
+    const opening = btn.getAttribute('aria-expanded') !== 'true';
+    list.querySelectorAll('.faq__item').forEach((el) => {
+      const open = opening && el === item;
+      el.classList.toggle('is-open', open);
+      el.querySelector('[data-faq-toggle]')?.setAttribute('aria-expanded', String(open));
+    });
+  });
+</script>

@@ -1,0 +1,57 @@
+---
+/**
+ * The giant headline split across the grid, Spur-style. Used by the hero
+ * (h1) and mirrored by the final CTA (h2).
+ */
+interface Props {
+  tag: 'h1' | 'h2';
+  dataAttr: string;
+}
+
+const { tag: Tag, dataAttr } = Astro.props;
+const WORDS = ['Cada mensaje', 'se vuelve', 'una cita.'];
+---
+
+<Tag class="headline page-grid">
+  {
+    WORDS.map((word, i) => (
+      <span class:list={['mask', `headline__w${i + 1}`]} {...{ [dataAttr]: String(i) }}>
+        <span class="mask__line">{word}</span>
+      </span>
+    ))
+  }
+</Tag>
+
+<style>
+  .headline {
+    margin: 0;
+    font: 400 min(9.4vw, 16vh) / 0.95 var(--font-display);
+    letter-spacing: -0.055em;
+    color: var(--fg);
+  }
+  .mask {
+    display: block;
+  }
+  .mask__line {
+    display: block;
+  }
+  .headline__w1 {
+    grid-column: 1 / span 9;
+  }
+  .headline__w2 {
+    grid-column: 7 / span 6;
+  }
+  .headline__w3 {
+    grid-column: 1 / span 7;
+  }
+  @media (max-width: 819.98px) {
+    .headline {
+      font-size: 15vw;
+    }
+    .headline__w1,
+    .headline__w2,
+    .headline__w3 {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

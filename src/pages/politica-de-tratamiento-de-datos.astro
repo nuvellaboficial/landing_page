@@ -1,0 +1,318 @@
+---
+import PrivacyPolicy from '../components/legal/PrivacyPolicy.astro';
+import Logo from '../components/Logo.astro';
+import { WHATSAPP_CONTACT_URL, WHATSAPP_DISPLAY } from '../lib/data';
+import Layout from '../layouts/Layout.astro';
+
+/** Table of contents: [section id in PrivacyPolicy, short label]. */
+const TOC = [
+  ['identificacion', '1. Identificación'],
+  ['objeto-y-alcance', '2. Objeto y alcance'],
+  ['roles', '3. Roles en el tratamiento'],
+  ['datos-tratados', '4. Datos personales tratados'],
+  ['datos-sensibles', '5. Datos sensibles'],
+  ['menores', '6. Datos de menores'],
+  ['fuentes', '7. Fuentes de los datos'],
+  ['finalidades', '8. Finalidades'],
+  ['consentimiento', '9. Autorización'],
+  ['inteligencia-artificial', '10. Inteligencia artificial'],
+  ['proveedores', '11. Proveedores'],
+  ['seguridad', '12. Seguridad'],
+  ['conservacion', '13. Conservación'],
+  ['derechos', '14. Derechos'],
+  ['procedimiento', '15. Procedimiento'],
+  ['cookies', '16. Cookies'],
+  ['terceros', '17. Terceros'],
+  ['modificaciones', '18. Modificaciones'],
+  ['vigencia', '19. Vigencia'],
+] as const;
+---
+
+<Layout
+  title="Política de tratamiento de datos personales · NuvelLab"
+  description="Cómo NuvelLab recolecta, usa, protege y elimina los datos personales tratados mediante la plataforma, conforme a la Ley 1581 de 2012."
+>
+  <header class="legal-nav">
+    <a href="/" aria-label="NuvelLab, inicio"><Logo size={21} /></a>
+    <!-- Mobile only (the side index is hidden there): the section being read. -->
+    <span class="legal-nav__current" data-current-section aria-live="polite"></span>
+    <a href="/" class="nav-label legal-nav__back">[ <span class="legal-nav__long">VOLVER AL </span>INICIO ]</a>
+    <span class="legal-nav__progress" data-reading-progress aria-hidden="true"></span>
+  </header>
+
+  <main class="legal page-grid">
+    <nav class="legal__toc" aria-label="Contenido de la política">
+      <p class="nav-label legal__toc-title">Contenido</p>
+      <ol>
+        {
+          TOC.map(([id, label]) => (
+            <li>
+              <a href={`#${id}`} data-toc-link>
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <article class="legal__doc">
+      <p class="nav-label legal__kicker">Información legal</p>
+      <h1>Política de Tratamiento de Datos Personales y Privacidad de NuvelLab</h1>
+      <PrivacyPolicy />
+      <button class="cta cta--ghost legal__print" type="button" data-print>[ IMPRIMIR O GUARDAR COMO PDF ]</button>
+    </article>
+  </main>
+
+  <footer class="legal-footer">
+    <span>© 2026 NuvelLab. Hecho en Colombia.</span>
+    <a href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener">WhatsApp {WHATSAPP_DISPLAY}</a>
+  </footer>
+</Layout>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+
+  // Reading position: highlight the current section in the index (desktop),
+  // name it in the header (mobile) and fill the reading progress bar.
+  const HEADER_OFFSET = 120; // a heading becomes "current" once it passes under the sticky header
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+  const headings = links
+    .map((a) => document.getElementById(a.hash.slice(1)))
+    .filter((h): h is HTMLElement => h !== null);
+  const currentLabel = document.querySelector<HTMLElement>('[data-current-section]');
+  const progress = document.querySelector<HTMLElement>('[data-reading-progress]');
+  const doc = document.querySelector<HTMLElement>('.legal__doc');
+  let current = -2;
+  let queued = false;
+
+  const update = () => {
+    queued = false;
+    let index = -1;
+    for (let i = 0; i < headings.length; i++) {
+      if (headings[i].getBoundingClientRect().top <= HEADER_OFFSET) index = i;
+      else break;
+    }
+    if (index !== current) {
+      current = index;
+      links.forEach((a, i) => (i === index ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (currentLabel) currentLabel.textContent = index >= 0 ? (links[index].textContent ?? '').trim() : '';
+    }
+    if (progress && doc) {
+      const r = doc.getBoundingClientRect();
+      const read = Math.min(1, Math.max(0, (HEADER_OFFSET - r.top) / Math.max(1, r.height - window.innerHeight + HEADER_OFFSET)));
+      progress.style.transform = `scaleX(${read})`;
+    }
+  };
+  const requestUpdate = () => {
+    if (!queued) {
+      queued = true;
+      requestAnimationFrame(update);
+    }
+  };
+  window.addEventListener('scroll', requestUpdate, { passive: true });
+  window.addEventListener('resize', requestUpdate, { passive: true });
+  update();
+</script>
+
+<style>
+  .legal-nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .legal-nav__back {
+    color: var(--muted);
+  }
+  .legal-nav__current {
+    display: none;
+  }
+  .legal-nav__progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+
+  .legal {
+    padding: 72px 0 96px;
+    row-gap: 40px;
+  }
+  .legal__toc {
+    grid-column: 1 / span 3;
+    padding: 0 16px 0 24px;
+    align-self: start;
+    position: sticky;
+    top: 104px;
+  }
+  .legal__toc-title {
+    margin: 0 0 16px;
+    color: var(--muted);
+  }
+  .legal__toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font: 14px/1.4 var(--font-body);
+  }
+  .legal__toc a {
+    display: block;
+    padding-left: 12px;
+    border-left: 2px solid transparent;
+    color: var(--muted);
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .legal__toc a:hover {
+    color: var(--fg);
+  }
+  /* Section being read. */
+  .legal__toc a[aria-current='true'] {
+    color: var(--fg);
+    border-left-color: var(--accent);
+  }
+
+  .legal__doc {
+    grid-column: 5 / span 7;
+    padding: 0 16px 0 12px;
+    max-width: 72ch;
+    font: 17px/1.7 var(--font-body);
+    color: #d4d4d4;
+  }
+  .legal__kicker {
+    margin: 0 0 16px;
+    color: var(--accent);
+  }
+  .legal__doc h1 {
+    margin: 0 0 32px;
+    font: 400 clamp(34px, 4vw, 56px) / 1.05 var(--font-display);
+    letter-spacing: -0.04em;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .legal__doc :global(h2) {
+    margin: 64px 0 16px;
+    font: 400 28px/1.2 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    scroll-margin-top: 96px;
+  }
+  .legal__doc :global(h3) {
+    margin: 32px 0 8px;
+    font: 500 19px/1.3 var(--font-display);
+    color: var(--fg);
+  }
+  .legal__doc :global(p) {
+    margin: 0 0 16px;
+  }
+  .legal__doc :global(ul),
+  .legal__doc :global(ol) {
+    margin: 0 0 16px;
+    padding-left: 22px;
+  }
+  .legal__doc :global(li) {
+    margin-bottom: 6px;
+  }
+  .legal__doc :global(li::marker) {
+    color: var(--accent);
+  }
+  .legal__doc :global(strong) {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .legal__print {
+    margin-top: 48px;
+    background: none;
+    cursor: pointer;
+  }
+
+  .legal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 32px 24px 40px;
+    border-top: 1px solid var(--line);
+    font: 14px var(--font-body);
+    color: var(--muted);
+  }
+
+  @media (max-width: 819.98px) {
+    .legal-nav {
+      padding: 0 16px;
+      gap: 12px;
+    }
+    .legal-nav__current {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      font: 500 13px var(--font-body);
+      color: var(--accent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .legal-nav__back {
+      flex: none;
+    }
+    /* Mobile: "[ INICIO ]" leaves room for the current section name. */
+    .legal-nav__long {
+      display: none;
+    }
+    .legal {
+      padding-top: 40px;
+    }
+    .legal__toc {
+      display: none;
+    }
+    .legal__doc {
+      grid-column: 1 / -1;
+      font-size: 16px;
+    }
+    .legal__doc :global(h2) {
+      font-size: 24px;
+      margin-top: 48px;
+    }
+    .legal-footer {
+      padding: 28px 16px 36px;
+    }
+  }
+
+  @media print {
+    .legal-nav,
+    .legal__toc,
+    .legal__print,
+    .legal-footer {
+      display: none;
+    }
+    .legal__doc {
+      grid-column: 1 / -1;
+      max-width: none;
+      color: #000;
+    }
+    .legal__doc h1,
+    .legal__doc :global(h2),
+    .legal__doc :global(h3),
+    .legal__doc :global(strong) {
+      color: #000;
+    }
+  }
+</style>

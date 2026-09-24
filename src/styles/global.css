@@ -1,0 +1,867 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   Tokens. Dark theme of the NuvelLab dashboard; the landing is dark only.
+   ============================================================ */
+:root {
+  --bg: #0a0a0a;
+  --surface: #121212;
+  --surface-2: #141414;
+  --surface-3: #1a1a1a;
+  --fg: #ebebeb;
+  --muted: #999999;
+  --dim: #808080;
+  --faint: #8a8a8a;
+  --accent: #ff9933;
+  --accent-fill: #c95000;
+  --accent-fill-hover: #b84800;
+  --accent-ink: #1a0e02;
+  --accent-soft: rgba(255, 153, 51, 0.14);
+  --income: #4ade80;
+  --expense: #f87171;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.18);
+
+  --font-display: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Page grid: 12 columns on desktop, 4 on mobile. */
+  --cols: 12;
+  --cell: calc(100vw / var(--cols));
+  --h2: clamp(40px, 4.4vw, 68px);
+  --section-gap: clamp(96px, 11vw, 170px);
+
+  /* Device scales. Defaults; scripts/viewport.ts refines them on resize. */
+  --dev-scale: 1;
+  --k2: 1;
+  --k3: 0.82;
+  --lap3-w: 520px;
+  --lap5-w: 880px;
+}
+
+@media (max-width: 819.98px) {
+  :root {
+    --cols: 4;
+    --h2: 38px;
+  }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.lenis {
+  scroll-behavior: auto;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+a {
+  color: var(--fg);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover {
+  color: var(--accent);
+}
+::selection {
+  background: var(--accent-fill);
+  color: #fff;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Layout primitives
+   ============================================================ */
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+}
+
+.section-title {
+  margin: 0;
+  padding: 0 16px 0 12px;
+  font: 400 var(--h2) / 1 var(--font-display);
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 0;
+  font: 400 18px/1.55 var(--font-body);
+  color: var(--muted);
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+
+/* Pinned (scroll-driven) section: a tall track with a sticky 100vh stage.
+   Without motion it collapses into a normal section in its final state. */
+.pinned {
+  position: relative;
+  z-index: 2;
+  height: var(--track, 300vh);
+}
+.pinned__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  align-content: center;
+  box-sizing: border-box;
+  padding: 80px 0 32px;
+}
+html:not(.motion) .pinned {
+  height: auto;
+}
+html:not(.motion) .pinned__stage {
+  position: relative;
+  height: auto;
+}
+@media (max-width: 819.98px) {
+  .pinned {
+    height: var(--track-mobile, var(--track, 300vh));
+  }
+  .pinned__stage {
+    padding: 80px 0 24px;
+  }
+}
+
+.muted {
+  color: var(--muted);
+}
+.dim {
+  color: var(--faint);
+}
+
+/* Word/line reveal: an overflow mask with an inner line that slides up.
+   Only hidden when motion is on (html.motion), so no-JS and reduced-motion
+   visitors always see the text. */
+.mask {
+  overflow: hidden;
+  padding: 0 0 0.06em 12px;
+}
+.mask__line {
+  transition: transform 0.9s var(--ease-out);
+}
+html.motion .mask:not(.is-revealed) .mask__line {
+  transform: translateY(105%);
+}
+
+/* ============================================================
+   Buttons (Spur-style bracketed mono CTAs)
+   ============================================================ */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 13px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  padding: 18px 20px;
+  border-radius: 2px;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.cta:active {
+  transform: scale(0.98);
+}
+.cta--primary {
+  background: var(--accent-fill);
+  color: #fff;
+}
+.cta--primary:hover {
+  background: var(--accent-fill-hover);
+  color: #fff;
+}
+.cta--ghost {
+  border: 1px solid var(--line-strong);
+  color: var(--fg);
+  padding: 17px 20px;
+}
+.cta--ghost:hover {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.nav-label {
+  font: 400 12px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   Phone frame. Designed at 280×570, scaled with --k.
+   ============================================================ */
+.phone {
+  width: calc(280px * var(--k, 1));
+  height: calc(570px * var(--k, 1));
+  flex: none;
+}
+.phone__device {
+  width: 280px;
+  height: 570px;
+  transform: scale(var(--k, 1));
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  border-radius: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #050505;
+  padding: 8px;
+}
+.phone__screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 36px;
+  overflow: hidden;
+  background: #0c0c0c;
+  display: flex;
+  flex-direction: column;
+}
+.phone__status {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 24px 6px;
+  font: 600 12px var(--font-body);
+}
+.battery {
+  width: 18px;
+  height: 9px;
+  border: 1px solid var(--fg);
+  border-radius: 3px;
+}
+
+/* WhatsApp-like chat */
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.chat-head__back {
+  color: var(--muted);
+  font: 20px/1 var(--font-body);
+}
+.chat-head__name {
+  font: 600 13px var(--font-body);
+}
+.chat-head__status {
+  font: 11px var(--font-body);
+  color: var(--muted);
+}
+.chat-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 12px 10px;
+  overflow: hidden;
+}
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px 16px;
+  align-items: center;
+}
+.chat-input__field {
+  flex: 1;
+  background: var(--surface-3);
+  border-radius: 99px;
+  padding: 9px 14px;
+  font: 12px var(--font-body);
+  color: var(--faint);
+}
+.chat-input__send {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1f1f1f;
+}
+
+.bubble {
+  max-width: 82%;
+  padding: 7px 10px 5px;
+  font: 13px/1.38 var(--font-body);
+  animation: pop 0.4s var(--ease-out) both;
+}
+.bubble--client {
+  align-self: flex-end;
+  background: #2a1b0d;
+  border-radius: 12px 12px 3px 12px;
+}
+.bubble--bot {
+  align-self: flex-start;
+  background: #1c1c1c;
+  border-radius: 12px 12px 12px 3px;
+}
+.bubble__meta {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 2px;
+}
+.bubble--client .bubble__meta {
+  color: #a8998a;
+}
+.bubble__ticks {
+  color: var(--accent);
+}
+.bubble--system {
+  align-self: center;
+  max-width: none;
+  background: #151515;
+  border: 1px solid rgba(255, 153, 51, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+.bubble--image {
+  align-self: flex-end;
+  background: #2a1b0d;
+  border-radius: 12px 12px 3px 12px;
+  padding: 4px;
+}
+.bubble__receipt {
+  width: 150px;
+  height: 92px;
+  border-radius: 9px;
+  background: repeating-linear-gradient(135deg, #221710 0 8px, #2b1d12 8px 16px);
+  display: grid;
+  place-items: center;
+  font: 11px var(--font-mono);
+  color: #c7b6a4;
+}
+.bubble--typing {
+  align-self: flex-start;
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 11px 12px;
+  display: flex;
+  gap: 4px;
+  animation: none;
+}
+.bubble--typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: typing-dot 1s infinite;
+}
+.bubble--typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.bubble--typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1f1f1f;
+  color: var(--fg);
+  display: grid;
+  place-items: center;
+  font: 600 9px var(--font-body);
+  flex: none;
+}
+.avatar--brand {
+  width: 32px;
+  height: 32px;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* ============================================================
+   Laptop frame. The screen is an 880×550 canvas scaled to fit --w.
+   ============================================================ */
+/* --w (frame width) and --screen-scale ((w - 18) / 880) are set per instance;
+   CSS cannot divide lengths, so scripts/viewport.ts computes the scale. */
+.laptop {
+  width: var(--w);
+}
+.laptop__lid {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 8px;
+  background: #050505;
+}
+.laptop__screen {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 880 / 550;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #0d0d0d;
+}
+.laptop__canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 880px;
+  height: 550px;
+  transform-origin: 0 0;
+  transform: scale(var(--screen-scale));
+}
+/* ============================================================
+   Simulated dashboard (mirrors app.nuvellab.cloud, dark theme)
+   ============================================================ */
+.dash {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d0d;
+  font-family: var(--font-body);
+}
+.dash__top {
+  height: 34px;
+  flex: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: #111;
+}
+.dash__icon {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.4px solid #666;
+}
+.dash__user {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3a2410;
+  color: var(--accent);
+  font: 600 9px/18px var(--font-body);
+  text-align: center;
+}
+.dash__body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+.dash__side {
+  width: 160px;
+  flex: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #101010;
+}
+.dash__brand {
+  font: 600 13px/1 var(--font-display);
+  padding: 2px 8px;
+}
+.dash__caption {
+  font: 500 8px/1 var(--font-body);
+  letter-spacing: 0.12em;
+  color: var(--faint);
+  padding: 4px 8px 12px;
+}
+.dash__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font: 500 11px/1 var(--font-body);
+  color: #b3b3b3;
+  transition:
+    background 0.3s,
+    color 0.3s;
+}
+.dash__nav-item::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border: 1.4px solid currentColor;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+.dash__nav-item.is-active {
+  color: var(--accent);
+  background: rgba(255, 153, 51, 0.12);
+}
+.dash__bot {
+  margin-top: auto;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 8px;
+  display: flex;
+  justify-content: space-between;
+  font: 10px var(--font-body);
+  color: var(--muted);
+}
+.dash__bot b {
+  font-weight: 400;
+  color: var(--fg);
+}
+.dash__bot b::before {
+  content: '● ';
+  color: var(--income);
+}
+.dash__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  gap: 12px;
+  position: relative;
+}
+.dash__title {
+  font: 600 22px/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.dash__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dash-btn {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  padding: 7px 11px;
+  font: 500 11px/1 var(--font-body);
+}
+.dash-btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.dash-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.dash-label {
+  font: 500 9px var(--font-body);
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.dash-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 5px;
+  background: var(--surface);
+  font: 500 11px/1 var(--font-body);
+}
+.seg {
+  display: flex;
+  background: var(--surface-3);
+  border-radius: 99px;
+  padding: 2px;
+}
+.seg span {
+  color: var(--muted);
+  padding: 5px 10px;
+  border-radius: 99px;
+}
+.seg .is-on {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Agenda calendar */
+.cal {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #101010;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.cal__head {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.cal__gutter {
+  width: 70px;
+  flex: none;
+}
+.cal__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  font: 500 11px var(--font-body);
+}
+.cal__body {
+  position: relative;
+  flex: 1;
+}
+.cal__hour {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cal__hour span {
+  display: block;
+  width: 62px;
+  text-align: right;
+  font: 10px var(--font-body);
+  color: var(--faint);
+  transform: translateY(-6px);
+  padding-right: 6px;
+  box-sizing: border-box;
+}
+.cal__area {
+  position: absolute;
+  left: 70px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.cal__vline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cal__block {
+  position: absolute;
+  box-sizing: border-box;
+  background: var(--surface-3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 5px 7px;
+  overflow: hidden;
+  font: 10px/1.35 var(--font-body);
+}
+.cal__name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal__block--new {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* Landing appointment: hidden until it "lands", then glows once. */
+.appt-landing {
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.5s ease,
+    box-shadow 1.3s ease,
+    transform 0.6s var(--ease-out);
+}
+.appt-landing.is-landed {
+  opacity: 1;
+  transform: none;
+}
+.appt-landing.is-glowing {
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 30px rgba(255, 153, 51, 0.65);
+}
+
+/* Mobile single-worker agenda card */
+.mini-agenda {
+  box-sizing: border-box;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 10px;
+}
+.mini-agenda__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.mini-agenda__worker {
+  font: 600 11px var(--font-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mini-agenda__grid {
+  position: relative;
+  height: 118px;
+  margin-top: 6px;
+}
+.mini-agenda__row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font: 9px var(--font-body);
+  color: var(--faint);
+  padding-top: 2px;
+}
+.mini-agenda__appt {
+  position: absolute;
+  left: 44px;
+  right: 0;
+  top: 40px;
+  height: 36px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font: 9px/1.3 var(--font-body);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+}
+
+/* ============================================================
+   "Tu panel" states shared by the laptop screens and the mobile phone
+   ============================================================ */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition:
+    opacity 0.5s ease,
+    transform 0.6s var(--ease-out);
+}
+/* Inactive screens wait below; the ones already passed sit above. */
+.screen:not(.is-active) {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+.screen.is-past {
+  transform: translateY(-12px);
+}
+
+/* Deposit approval: .is-approved on the screen flips labels and colors. */
+.deposit__approve {
+  border-radius: 7px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  transition: background 0.25s;
+}
+.when-approved,
+.is-approved .when-pending {
+  display: none;
+}
+.is-approved .when-approved {
+  display: inline;
+}
+.is-approved .deposit__approve {
+  background: #1f2a22;
+  color: var(--income);
+}
+
+/* New cash entry: appears when the panel script flags it. */
+html.motion .cash__new:not(.is-in) {
+  display: none;
+}
+.cash__new.is-in {
+  animation: rise 0.6s var(--ease-out) both;
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Still mode: prefers-reduced-motion. Everything in its final state.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

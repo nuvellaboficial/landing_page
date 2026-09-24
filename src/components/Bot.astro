@@ -1,0 +1,174 @@
+---
+import { BENTO } from '../lib/data';
+import { messagesHtml, visibleMessages } from '../lib/templates';
+---
+
+<section id="el-bot" class="bot">
+  <div class="page-grid bot__layout">
+    <h2 class="section-title bot__title">Lo que el bot resuelve solo.</h2>
+    <div class="bot__bento">
+      {
+        BENTO.map((card, i) => (
+          <article class:list={['bento', `bento--${i}`]} data-bento={i}>
+            <div class="bento__text">
+              <h3 class="bento__title">{card.title}</h3>
+              <p class="bento__sub">{card.sub}</p>
+            </div>
+            <div class="bento__chat" aria-hidden="true" data-focus="bot">
+              <div class="bento__head">
+                <div class="avatar bento__avatar">{card.bizInitials}</div>
+                <div class="bento__biz">{card.biz}</div>
+              </div>
+              <div
+                class="chat-body bento__body"
+                data-chat={`bento-${i}`}
+                set:html={messagesHtml(visibleMessages(card.script, card.script.length))}
+              />
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .bot {
+    position: relative;
+    z-index: 2;
+    padding: var(--section-gap) 0 0;
+  }
+  .bot__layout {
+    row-gap: 48px;
+  }
+  .bot__title {
+    grid-column: 1 / span 6;
+  }
+  .bot__bento {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: minmax(300px, auto);
+  }
+  .bento {
+    border: 1px solid var(--line);
+    margin: -1px 0 0 -1px;
+    /* Translucent so the particle field behind still reads around the chats. */
+    background: rgba(14, 14, 14, 0.45);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    transition:
+      opacity 0.7s ease var(--delay),
+      transform 0.8s var(--ease-out) var(--delay);
+  }
+  .bento--0 {
+    grid-column: 1 / 8;
+    grid-row: 1 / 3;
+    --delay: 0s;
+    --from: translateX(-60px);
+  }
+  .bento--1 {
+    grid-column: 8 / 13;
+    grid-row: 1 / 2;
+    --delay: 0.12s;
+    --from: translateY(-50px);
+  }
+  .bento--2 {
+    grid-column: 8 / 13;
+    grid-row: 2 / 4;
+    --delay: 0.24s;
+    --from: translateX(60px);
+  }
+  .bento--3 {
+    grid-column: 1 / 8;
+    grid-row: 3 / 4;
+    flex-direction: row;
+    --delay: 0.36s;
+    --from: translateY(60px);
+  }
+  :global(html.motion) .bento:not(.is-in) {
+    opacity: 0;
+    transform: var(--from);
+  }
+  .bento__text {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .bento--3 .bento__text {
+    flex: 0 0 40%;
+  }
+  .bento__title {
+    margin: 0;
+    font: 400 26px/1.05 var(--font-display);
+    letter-spacing: -0.03em;
+    max-width: 16ch;
+  }
+  .bento--0 .bento__title {
+    font-size: clamp(34px, 3.4vw, 50px);
+  }
+  .bento__sub {
+    margin: 0;
+    font: 15px/1.5 var(--font-body);
+    color: var(--muted);
+    max-width: 36ch;
+  }
+  .bento__chat {
+    flex: 1;
+    min-height: 210px;
+    display: flex;
+    flex-direction: column;
+    background: #0b0b0b;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .bento--0 .bento__chat {
+    min-height: 380px;
+  }
+  .bento--2 .bento__chat {
+    min-height: 330px;
+  }
+  .bento__head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .bento__avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 10px;
+    color: var(--accent);
+  }
+  .bento__biz {
+    font: 600 12px var(--font-body);
+  }
+  .bento__body {
+    padding: 12px;
+  }
+
+  @media (max-width: 819.98px) {
+    .bot__title {
+      grid-column: 1 / -1;
+    }
+    .bot__bento {
+      grid-auto-rows: auto;
+    }
+    .bento {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      flex-direction: column;
+      padding: 20px 16px;
+    }
+    .bento--0 .bento__title {
+      font-size: 26px;
+    }
+    .bento--0 .bento__chat {
+      min-height: 340px;
+    }
+  }
+</style>

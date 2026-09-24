@@ -1,0 +1,113 @@
+---
+import { CLIENTS, CLIENT_HISTORY } from '../../lib/data';
+---
+
+<div class="screen screen--clients">
+  <div class="dash__row">
+    <div class="dash__title">Clientes</div>
+    <div class="clients__search">Buscar por nombre o teléfono</div>
+  </div>
+  <div class="clients__body">
+    <div class="clients__table">
+      <div class="clients__tr clients__th dash-label"><span>Nombre</span><span>Teléfono</span><span>Citas</span><span>Última</span></div>
+      {
+        CLIENTS.map(([name, phone, count, lastVisit], i) => (
+          <div class:list={['clients__tr', { 'clients__tr--on': i === 0 }]}>
+            <span class="clients__name">{name}</span>
+            <span class="muted">{phone}</span>
+            <span>{count}</span>
+            <span class="muted">{lastVisit}</span>
+          </div>
+        ))
+      }
+    </div>
+    <div class="dash-card clients__detail">
+      <div class="clients__who">Laura Restrepo</div>
+      <div class="muted">+57 310 482 1937 · 12 citas</div>
+      <div class="dash-label clients__label">Historial</div>
+      {
+        CLIENT_HISTORY.map(([svc, date, worker, price], i) => (
+          <div class="clients__hist" style={`--i:${i}`}>
+            <div>
+              <div class="clients__name">{svc}</div>
+              <div class="muted">
+                {date} · {worker}
+              </div>
+            </div>
+            <div>{price}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .screen--clients {
+    padding: 18px 20px;
+  }
+  .clients__search {
+    width: 220px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 7px;
+    padding: 7px 10px;
+    font: 11px var(--font-body);
+    color: var(--faint);
+  }
+  .clients__body {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    min-height: 0;
+  }
+  .clients__table {
+    flex: 1.4;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #101010;
+    overflow: hidden;
+    font: 11px/1.3 var(--font-body);
+  }
+  .clients__tr {
+    display: grid;
+    grid-template-columns: 1.4fr 1.2fr 50px 90px;
+    padding: 9px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .clients__th {
+    border-top: none;
+    background: var(--surface-2);
+    font-size: 9px;
+  }
+  .clients__tr--on {
+    background: rgba(255, 153, 51, 0.08);
+  }
+  .clients__name {
+    font-weight: 500;
+  }
+  .clients__detail {
+    flex: 1;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font: 11px/1.4 var(--font-body);
+  }
+  .clients__who {
+    font: 600 15px var(--font-body);
+  }
+  .clients__label {
+    margin-top: 4px;
+  }
+  .clients__hist {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 8px;
+  }
+  /* History rows enter staggered each time this screen becomes active. */
+  :global(.screen--clients.is-active) .clients__hist {
+    animation: rise 0.5s var(--ease-out) calc(0.2s + var(--i) * 0.12s) both;
+  }
+</style>

@@ -1,0 +1,154 @@
+---
+/**
+ * Three verifiable product facts. Built so each can later become a real,
+ * anonymised usage metric with the same "big figure + one line" treatment.
+ * The page particle field gathers around the figure in view (data-focus).
+ */
+import { TRUST } from '../lib/data';
+
+const FACTS = [
+  { key: 'always', line: 'Tus clientes agendan de día, de noche y en festivo.' },
+  { key: 'days', line: 'De la demo a tu bot contestando.' },
+  { key: 'number', line: 'No cambias de WhatsApp ni les avisas nada a tus clientes.' },
+];
+---
+
+<section class="facts" data-facts>
+  <div class="page-grid facts__grid">
+    <h2 class="section-title facts__title">Lo que pasa cuando el bot contesta.</h2>
+
+    {
+      FACTS.map((f) => (
+        <div class:list={['fact', `fact--${f.key}`]}>
+          <div class="fact__clip" data-focus="facts">
+            <div class="fact__value">
+              {f.key === 'always' && (
+                <>
+                  <span data-count="24">24</span>/7
+                </>
+              )}
+              {f.key === 'days' && (
+                <>
+                  {/* Never count from 0: "0 a 0 días" reads wrong mid-animation. */}
+                  <span data-count="2" data-count-min="1">2</span> a <span data-count="3" data-count-min="1">3</span> días
+                </>
+              )}
+              {f.key === 'number' && 'Tu mismo número'}
+            </div>
+          </div>
+          <p class="fact__line">{f.line}</p>
+        </div>
+      ))
+    }
+
+    <ul class="facts__trust">
+      {TRUST.map((t) => <li>{t}</li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .facts {
+    position: relative;
+    z-index: 2;
+    padding: clamp(110px, 12vw, 190px) 0 0;
+  }
+  .facts__grid {
+    row-gap: 96px;
+  }
+  .facts__title {
+    grid-column: 1 / span 6;
+  }
+  .fact {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 16px 0 12px;
+  }
+  .fact--always {
+    gap: 6vw;
+  }
+  .fact--days {
+    grid-column: 3 / -1;
+    gap: 4vw;
+  }
+  .fact--number {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .fact__clip {
+    flex: none;
+    max-width: 100%;
+    padding: 0.1em 0.12em 0.16em 0;
+  }
+  .fact--number .fact__clip {
+    overflow: hidden;
+  }
+  .fact__value {
+    font: 400 17vw/1 var(--font-display);
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+  }
+  .fact--days .fact__value {
+    font-size: 10.5vw;
+  }
+  .fact--number .fact__value {
+    font-size: 8.4vw;
+    transition: transform 1s var(--ease-out) 0.15s;
+  }
+  :global(html.motion) .facts:not(.is-in) .fact--number .fact__value {
+    transform: translateY(105%);
+  }
+  .fact__line {
+    margin: 0;
+    font: 400 19px/1.5 var(--font-body);
+    color: var(--muted);
+    max-width: 30ch;
+    padding-bottom: 0.6em;
+  }
+  .facts__trust {
+    grid-column: 1 / -1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .facts__trust li {
+    padding: 24px 16px 24px 12px;
+    border-left: 1px solid var(--line);
+    margin-left: -1px;
+    font: 500 16px/1.45 var(--font-body);
+  }
+
+  @media (max-width: 819.98px) {
+    .facts__grid {
+      row-gap: 64px;
+    }
+    .facts__title,
+    .fact--days {
+      grid-column: 1 / -1;
+    }
+    .fact {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .fact__value {
+      font-size: 34vw;
+    }
+    .fact--days .fact__value {
+      font-size: 14vw;
+    }
+    .fact--number .fact__value {
+      font-size: 15vw;
+      white-space: normal;
+    }
+    .facts__trust {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,174 @@
+---
+/** Deposit verification. `data-deposit` toggles .is-approved (default: approved). */
+---
+
+<div class="screen screen--deposit is-approved" data-deposit>
+  <div>
+    <div class="dash__title">Anticipos por verificar</div>
+    <div class="deposit__sub">Comprobantes que tus clientes enviaron por WhatsApp.</div>
+  </div>
+  <div class="deposit__body">
+    <div class="deposit__queue">
+      <div class="deposit__item deposit__item--on">
+        <div class="deposit__line"><span>Laura Restrepo</span><span>$ 30.000</span></div>
+        <div class="muted">Masaje relajante · Vie 3:00 p. m.</div>
+      </div>
+      <div class="deposit__item">
+        <div class="deposit__line"><span>Andrés Gómez</span><span>$ 15.000</span></div>
+        <div class="muted">Corte + barba · Sáb 11:00 a. m.</div>
+      </div>
+    </div>
+    <div class="dash-card deposit__detail">
+      <div class="deposit__receipt">comprobante de transferencia</div>
+      <div class="deposit__info">
+        <div class="deposit__top">
+          <span class="deposit__name">Laura Restrepo</span>
+          <span class="deposit__badge"><span class="when-pending">Por verificar</span><span class="when-approved">Aprobado</span></span>
+        </div>
+        <div class="deposit__facts">
+          <span class="muted">Servicio</span><span>Masaje relajante</span>
+          <span class="muted">Cita</span><span>Viernes 25, 3:00 p. m.</span>
+          <span class="muted">Con</span><span>Camila Ortiz</span>
+          <span class="muted">Anticipo</span><span class="deposit__strong">$ 30.000</span>
+          <span class="muted">Recibido</span><span>9:43 p. m. por WhatsApp</span>
+        </div>
+        <div class="deposit__buttons">
+          <span class="dash-btn">Rechazar</span>
+          <span class="deposit__approve"><span class="when-pending">Aprobar anticipo</span><span class="when-approved">Aprobado ✓</span></span>
+          <span class="deposit__cursor"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .screen--deposit {
+    padding: 18px 20px;
+    gap: 14px;
+  }
+  .deposit__sub {
+    font: 12px var(--font-body);
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .deposit__body {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    min-height: 0;
+  }
+  .deposit__queue {
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .deposit__item {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
+    padding: 11px;
+    font: 11px/1.4 var(--font-body);
+  }
+  .deposit__item--on {
+    border-color: var(--accent);
+    background: #1a140e;
+  }
+  .deposit__line {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+  }
+  .deposit__detail {
+    flex: 1;
+    padding: 14px;
+    display: flex;
+    gap: 14px;
+  }
+  .deposit__receipt {
+    width: 200px;
+    border-radius: 8px;
+    background: repeating-linear-gradient(135deg, #171717 0 8px, #1c1c1c 8px 16px);
+    display: grid;
+    place-items: center;
+    font: 11px var(--font-mono);
+    color: var(--muted);
+    text-align: center;
+    padding: 10px;
+  }
+  .deposit__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font: 12px/1.4 var(--font-body);
+  }
+  .deposit__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .deposit__name {
+    font: 600 15px var(--font-body);
+  }
+  .deposit__badge {
+    font: 500 10px var(--font-body);
+    padding: 4px 8px;
+    border-radius: 99px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .deposit__facts {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    row-gap: 8px;
+  }
+  .deposit__strong {
+    font-weight: 600;
+  }
+  .deposit__buttons {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    position: relative;
+  }
+  .deposit__approve {
+    padding: 8px 12px;
+    font: 500 11px var(--font-body);
+  }
+  .deposit__cursor {
+    display: none;
+    position: absolute;
+    right: 30px;
+    bottom: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--fg);
+    border: 2px solid var(--bg);
+  }
+  .screen--deposit.is-active .deposit__cursor {
+    display: block;
+    animation: cursor-in 1.8s var(--ease-in-out) both;
+  }
+  .is-approved .deposit__badge {
+    background: rgba(74, 222, 128, 0.14);
+    color: var(--income);
+  }
+  @keyframes cursor-in {
+    0% {
+      transform: translate(-200px, -150px);
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    70%,
+    100% {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+  }
+</style>

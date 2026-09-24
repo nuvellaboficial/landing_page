@@ -1,0 +1,166 @@
+---
+import {
+  APP_URL,
+  NAV_LINKS,
+  PRIVACY_POLICY_URL,
+  WHATSAPP_CONTACT_URL,
+  WHATSAPP_DEMO_URL,
+  WHATSAPP_DISPLAY,
+} from '../lib/data';
+import HeadlineMask from './HeadlineMask.astro';
+import Logo from './Logo.astro';
+---
+
+<section class="final" data-final>
+  <HeadlineMask tag="h2" dataAttr="data-final-word" />
+  <div class="page-grid final__grid">
+    <div class="final__card-col" aria-hidden="true">
+      <div class="final__card-wrap">
+        <!-- The page particle field gathers around this card (data-focus). -->
+        <div class="final__card" data-focus="final">
+          <div>
+            <div class="final__client">Laura Restrepo</div>
+            <div class="final__svc">Masaje relajante con Camila</div>
+          </div>
+          <div class="final__when">Mañana<br />3:00 p. m.</div>
+        </div>
+      </div>
+    </div>
+    <div class="final__cta-col">
+      <a class="cta cta--primary final__cta" href={WHATSAPP_DEMO_URL} target="_blank" rel="noopener">[ AGENDA UNA DEMO → ]</a>
+    </div>
+  </div>
+
+  <footer class="page-grid footer">
+    <div class="footer__brand">
+      <Logo size={24} />
+      <span class="muted">© 2026 NuvelLab. Hecho en Colombia.</span>
+    </div>
+    <nav class="footer__nav nav-label" aria-label="Secciones">
+      {NAV_LINKS.map((l) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+    <div class="footer__contact">
+      <a href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener">WhatsApp {WHATSAPP_DISPLAY}</a>
+      <a href={PRIVACY_POLICY_URL} class="muted">Política de tratamiento de datos</a>
+      <a href={APP_URL} class="muted">Ingresar al panel</a>
+    </div>
+  </footer>
+</section>
+
+<style>
+  .final {
+    position: relative;
+    z-index: 2;
+    padding: clamp(120px, 14vw, 220px) 0 0;
+  }
+  .final :global(.mask:nth-child(2) .mask__line) {
+    transition-delay: 0.12s;
+  }
+  .final :global(.mask:nth-child(3) .mask__line) {
+    transition-delay: 0.24s;
+  }
+  .final__grid {
+    margin-top: 56px;
+    row-gap: 40px;
+  }
+  .final__card-col {
+    grid-column: 1 / span 5;
+    padding: 0 12px;
+  }
+  .final__card-wrap {
+    position: relative;
+    width: 300px;
+  }
+  .final__card {
+    min-height: 70px;
+    box-sizing: border-box;
+    border: 1px solid var(--accent);
+    background: rgba(255, 153, 51, 0.1);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 40px rgba(255, 153, 51, 0.35);
+    transition:
+      opacity 0.6s ease 1s,
+      box-shadow 1.4s ease 1.2s;
+  }
+  /* The card lights up after the particles have gathered around it. */
+  :global(html.motion) .final:not(.is-in) .final__card {
+    opacity: 0;
+    box-shadow: none;
+  }
+  .final__client {
+    font: 600 14px var(--font-body);
+  }
+  .final__svc,
+  .final__when {
+    font: 13px var(--font-body);
+  }
+  .final__when {
+    font-weight: 500;
+    text-align: right;
+  }
+  .final__cta-col {
+    grid-column: 7 / span 6;
+    padding: 0 12px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .final__cta {
+    font-size: clamp(16px, 1.5vw, 22px);
+    padding: 28px 34px;
+  }
+
+  .footer {
+    margin-top: clamp(100px, 10vw, 160px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    row-gap: 32px;
+    padding: 40px 0 48px;
+  }
+  .footer__brand,
+  .footer__nav,
+  .footer__contact {
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .footer__brand {
+    grid-column: 1 / span 4;
+    font: 14px/1.5 var(--font-body);
+  }
+  .footer__nav {
+    grid-column: 6 / span 3;
+  }
+  .footer__nav a {
+    color: var(--muted);
+  }
+  .footer__nav a:hover {
+    color: var(--fg);
+  }
+  .footer__contact {
+    grid-column: 9 / span 4;
+    font: 15px/1.4 var(--font-body);
+  }
+
+  @media (max-width: 819.98px) {
+    .final__card-col,
+    .final__cta-col,
+    .footer__brand,
+    .footer__nav,
+    .footer__contact {
+      grid-column: 1 / -1;
+    }
+    .final__cta-col {
+      justify-content: stretch;
+    }
+    .final__cta {
+      width: 100%;
+      font-size: 15px;
+      white-space: normal;
+    }
+  }
+</style>
