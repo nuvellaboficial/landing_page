@@ -1,7 +1,7 @@
 ---
 import PrivacyPolicy from '../components/legal/PrivacyPolicy.astro';
 import Logo from '../components/Logo.astro';
-import { WHATSAPP_CONTACT_URL, WHATSAPP_DISPLAY } from '../lib/data';
+import { LEGAL_FOOTER, WHATSAPP_CONTACT_URL, WHATSAPP_DISPLAY } from '../lib/data';
 import Layout from '../layouts/Layout.astro';
 
 /** Table of contents: [section id in PrivacyPolicy, short label]. */
@@ -66,6 +66,7 @@ const TOC = [
 
   <footer class="legal-footer">
     <span>© 2026 NuvelLab. Hecho en Colombia.</span>
+    <span>{LEGAL_FOOTER}</span>
     <a href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener">WhatsApp {WHATSAPP_DISPLAY}</a>
   </footer>
 </Layout>

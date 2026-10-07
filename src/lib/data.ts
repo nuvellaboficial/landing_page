@@ -1,9 +1,11 @@
 /** Landing content. Everything the visitor reads lives here, separated from layout and behavior. */
 
 export const WHATSAPP_DEMO_URL =
-  'https://wa.me/573178605783?text=Hola%2C%20quiero%20agendar%20una%20demo%20de%20NuvelLab';
-export const WHATSAPP_CONTACT_URL = 'https://wa.me/573178605783';
-export const WHATSAPP_DISPLAY = '+57 317 860 5783';
+  'https://wa.me/573214905373?text=Hola%2C%20quiero%20agendar%20una%20demo%20de%20NuvelLab';
+export const WHATSAPP_CONTACT_URL = 'https://wa.me/573214905373';
+export const WHATSAPP_DISPLAY = '+57 321 490 5373';
+/** Legal identity as it appears in the Cámara de Comercio certificate and Meta Business Verification. */
+export const LEGAL_FOOTER = 'NUVELLAB · NIT 1006462332-5 · Villavicencio, Meta';
 export const APP_URL = 'https://app.nuvellab.cloud';
 /** src/pages/politica-de-tratamiento-de-datos.astro (moved from GitHub Pages). */
 export const PRIVACY_POLICY_URL = '/politica-de-tratamiento-de-datos';

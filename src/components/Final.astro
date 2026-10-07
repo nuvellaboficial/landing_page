@@ -1,6 +1,7 @@
 ---
 import {
   APP_URL,
+  LEGAL_FOOTER,
   NAV_LINKS,
   PRIVACY_POLICY_URL,
   WHATSAPP_CONTACT_URL,
@@ -39,6 +40,7 @@ import Logo from './Logo.astro';
     <div class="footer__brand">
       <Logo size={24} />
       <span class="muted">© 2026 NuvelLab. Hecho en Colombia.</span>
+      <span class="muted">{LEGAL_FOOTER}</span>
     </div>
     <nav class="footer__nav nav-label" aria-label="Secciones">
       {NAV_LINKS.map((l) => <a href={l.href}>{l.label}</a>)}
