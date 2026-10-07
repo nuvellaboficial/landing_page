@@ -1,0 +1,34 @@
+---
+import TermsOfService from '../components/legal/TermsOfService.astro';
+import LegalLayout from '../layouts/LegalLayout.astro';
+
+/** Table of contents: [section id in TermsOfService, short label]. */
+const TOC = [
+  ['quienes-somos', '1. Quiénes somos'],
+  ['definiciones', '2. Definiciones'],
+  ['servicio', '3. El servicio'],
+  ['condiciones-comerciales', '4. Condiciones comerciales'],
+  ['whatsapp', '5. Número de WhatsApp'],
+  ['obligaciones-negocio', '6. Obligaciones del negocio'],
+  ['uso-aceptable', '7. Uso aceptable'],
+  ['inteligencia-artificial', '8. Inteligencia artificial'],
+  ['disponibilidad-y-soporte', '9. Disponibilidad y soporte'],
+  ['datos-personales', '10. Datos personales'],
+  ['propiedad-intelectual', '11. Propiedad intelectual'],
+  ['confidencialidad', '12. Confidencialidad'],
+  ['responsabilidad', '13. Responsabilidad'],
+  ['terminacion', '14. Terminación'],
+  ['modificaciones', '15. Modificaciones'],
+  ['ley-aplicable', '16. Ley aplicable'],
+  ['contacto', '17. Contacto'],
+] as const;
+---
+
+<LegalLayout
+  title="Términos y condiciones · NuvelLab"
+  description="Condiciones de uso de NuvelLab para los negocios que lo contratan: el servicio, pagos, WhatsApp, inteligencia artificial, datos personales y terminación."
+  heading="Términos y Condiciones de Uso de NuvelLab"
+  toc={TOC}
+>
+  <TermsOfService />
+</LegalLayout>

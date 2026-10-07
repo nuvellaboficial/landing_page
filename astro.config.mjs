@@ -8,6 +8,7 @@ export default defineConfig({
   // Short link used in the WhatsApp consent notice and the dashboard.
   redirects: {
     '/privacidad': '/politica-de-tratamiento-de-datos',
+    '/terminos': '/terminos-y-condiciones',
   },
   vite: {
     plugins: [tailwindcss()],

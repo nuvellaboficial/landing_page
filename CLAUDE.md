@@ -81,6 +81,12 @@ Vive en `/politica-de-tratamiento-de-datos` (`src/pages/politica-de-tratamiento-
 - **Datos del responsable:** se publica lo que exige el Decreto 1377 (nombre, domicilio, dirección, correo y teléfono) más la identidad legal con la que Meta verificó el negocio el 2026-10-07: el NIT 1006462332-5 y el establecimiento NUVELLAB con matrícula 507035 de la Cámara de Comercio de Villavicencio. El NIT de una persona natural es su cédula más el dígito de verificación; el usuario decidió publicarlo igual (2026-10-07), y además ya es público en el RUES. La dirección se escribe exactamente como en el certificado de la Cámara (`DIG 6A SUR No. 42-135 PRADO VERDE`) y no se repite en ningún otro lugar. El NIT sí va también en el pie de página (`LEGAL_FOOTER` en `src/lib/data.ts`).
 - **Sin terceros en el navegador:** las fuentes vienen de `@fontsource-variable/*` (empaquetadas en el build), no de Google Fonts. La política declara que el sitio no carga recursos de terceros, ni cookies, ni analítica: agregar cualquiera de esas cosas exige cambiar la política antes.
 
+## Términos y condiciones
+
+Viven en `/terminos-y-condiciones` (`src/pages/terminos-y-condiciones.astro`), con el atajo `/terminos` (redirect en `astro.config.mjs`). El texto está en `src/components/legal/TermsOfService.astro`. Las dos páginas legales comparten el mismo diseño: `src/layouts/LegalLayout.astro` (encabezado con barra de lectura, índice lateral, botón de imprimir y pie de página). La v1.0 (2026-10-07) se escribió para el App Review de Meta y la fase de Tech Provider. Funciona como contrato marco con los negocios: **las tarifas no van aquí**, sino en la propuesta comercial de cada cliente. La sección 10 hace las veces del contrato de transmisión de datos que exige la política (sección 3.2). Son texto legal: se editan solo con revisión del usuario, y en cada cambio se suben la versión y la fecha.
+
+**Cuidado con los espacios en el texto legal:** Astro elimina el salto de línea que queda justo antes de un `<a>` o `<strong>` en línea. Si la etiqueta empieza la línea siguiente, la palabra anterior queda pegada (por ejemplo "es<strong>Google"). Esas etiquetas van en la misma línea que la palabra anterior.
+
 ## Código
 
 - **Clean code y patrones cuando aporten claridad.** El diseño de Claude Design (`docs/design/`) es la referencia visual, no código para copiar: se reestructura en componentes pequeños de una sola responsabilidad.

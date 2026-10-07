@@ -9,6 +9,8 @@ export const LEGAL_FOOTER = 'NUVELLAB · NIT 1006462332-5 · Villavicencio, Meta
 export const APP_URL = 'https://app.nuvellab.cloud';
 /** src/pages/politica-de-tratamiento-de-datos.astro (moved from GitHub Pages). */
 export const PRIVACY_POLICY_URL = '/politica-de-tratamiento-de-datos';
+/** src/pages/terminos-y-condiciones.astro. */
+export const TERMS_URL = '/terminos-y-condiciones';
 
 export const NAV_LINKS = [
   { label: 'CÓMO FUNCIONA', href: '#como-funciona' },
