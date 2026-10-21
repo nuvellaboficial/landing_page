@@ -1,17 +1,23 @@
 ---
 /**
- * Política de Tratamiento de Datos Personales y Privacidad (v1.1).
- * v1.0 (10 jul 2026) was written for the n8n/Railway architecture; v1.1 aligns it
- * with what the platform actually stores and the providers it actually uses.
+ * Política de Tratamiento de Datos Personales y Privacidad (v1.2).
+ * v1.0 (10 jul 2026) was written for the n8n/Railway architecture; v1.1 aligned it
+ * with what the platform actually stores and the providers it actually uses;
+ * v1.2 covers NuvelLab as a Meta Tech Provider (each business connects its own
+ * WhatsApp with Embedded Signup and coexistence, no Chatwoot) and Anthropic as
+ * the main AI provider. It must go live together with the Tech Provider release.
  * This file is the only copy of the policy. Legal text: do not edit without the
  * owner's review, and bump the version and dates on every change.
  */
+
+// Tech Provider production release date. Used in the header and in §19.
+const V1_2_EFFECTIVE_DATE = '21 de octubre de 2026';
 ---
 
 <p>
-  <strong>Versión:</strong> 1.1<br />
+  <strong>Versión:</strong> 1.2<br />
   <strong>Fecha de entrada en vigencia de la primera versión:</strong> 10 de julio de 2026<br />
-  <strong>Última actualización:</strong> 7 de octubre de 2026
+  <strong>Última actualización:</strong> {V1_2_EFFECTIVE_DATE}
 </p>
 
 <h2 id="identificacion">1. Identificación del responsable</h2>
@@ -100,9 +106,9 @@
 
 <h3>3.3. Quién puede ver la información</h3>
 <ul>
-  <li><strong>Dentro de cada negocio:</strong> el propietario ve toda la información de su negocio, incluidas las conversaciones de WhatsApp, a las que accede con la cuenta de la bandeja de conversaciones creada para su negocio. Los trabajadores con acceso al panel ven la información de clientes y citas que necesitan para atenderlos, pero no las conversaciones; tampoco pueden descargar la base de datos, eliminar clientes ni ver las analíticas.</li>
+  <li><strong>Dentro de cada negocio:</strong> el negocio ve sus conversaciones de WhatsApp en su propia aplicación de WhatsApp Business, que sigue usando en el celular mientras el asistente atiende el mismo número. Quién tiene acceso a esa aplicación lo decide el negocio. En el panel, el propietario ve toda la información de su negocio y es el único que aprueba o rechaza los comprobantes de pago. Los trabajadores con acceso al panel ven la información de clientes y citas que necesitan para atenderlos y los avisos de los chats que necesitan a una persona (el nombre del cliente y el motivo, nunca los mensajes), y pueden tomar un chat o devolvérselo al asistente; no pueden descargar la base de datos, eliminar clientes ni ver las analíticas.</li>
   <li><strong>Entre negocios:</strong> la información de cada negocio está separada de la de los demás; un negocio nunca ve datos de otro.</li>
-  <li><strong>Personal de NuvelLab:</strong> puede acceder a la información de un negocio y a su bandeja de conversaciones únicamente para configurar el servicio, prestar soporte, investigar errores o incidentes de seguridad, o atender una solicitud del negocio o de un titular, y siempre bajo deber de confidencialidad.</li>
+  <li><strong>Personal de NuvelLab:</strong> puede acceder a la información que la plataforma guarda de un negocio, y usar el permiso que el negocio le otorgó sobre su cuenta de WhatsApp Business, únicamente para configurar el servicio, prestar soporte, investigar errores o incidentes de seguridad, o atender una solicitud del negocio o de un titular, y siempre bajo deber de confidencialidad. El personal de NuvelLab no tiene acceso a la aplicación de WhatsApp Business del negocio.</li>
 </ul>
 
 <h2 id="datos-tratados">4. Datos personales tratados</h2>
@@ -115,6 +121,8 @@
   <li>rol y negocio al que pertenece;</li>
   <li>fecha y versión de la política aceptada;</li>
   <li>información comercial y de contacto del negocio, y su configuración: servicios, precios, horarios, políticas y datos para recibir pagos;</li>
+  <li>datos de la cuenta de WhatsApp Business conectada: los identificadores que Meta asigna al portafolio comercial, a la cuenta y al número; el número de teléfono y el nombre verificado que muestra WhatsApp; el estado de la conexión, y la credencial de acceso que Meta entrega al conectar, que se guarda cifrada;</li>
+  <li>avisos que la plataforma muestra en el panel, como un chat que necesita a una persona o un comprobante pendiente de verificar;</li>
   <li>solicitudes de soporte y comunicaciones;</li>
   <li>información contractual, tributaria y de facturación, cuando corresponda.</li>
 </ul>
@@ -130,19 +138,32 @@
 <h3>4.3. Clientes atendidos por los negocios</h3>
 <ul>
   <li>número de teléfono;</li>
+  <li>identificador de usuario de WhatsApp: un código que Meta asigna a cada persona para cada negocio y que envía con cada mensaje. Cuando la persona usa un nombre de usuario de WhatsApp, Meta puede enviar solo este identificador, sin el número de teléfono;</li>
+  <li>nombre de usuario de WhatsApp (por ejemplo, @laura.gomez), cuando la persona lo tiene activo y Meta lo envía, o cuando el negocio lo registra en el panel;</li>
   <li>nombre del perfil de WhatsApp y nombre confirmado por el titular;</li>
   <li>correo electrónico, número de cédula y fecha de nacimiento, cuando el cliente los proporciona o el negocio los registra;</li>
   <li>autorización otorgada: fecha, hora, canal, texto del aviso, respuesta del titular e identificador del mensaje;</li>
-  <li>mensajes enviados al asistente y sus respuestas, incluida la transcripción en texto de las notas de voz;</li>
-  <li>fotografías y notas de voz enviadas por WhatsApp;</li>
+  <li>mensajes enviados al asistente y sus respuestas, incluida la transcripción en texto de las notas de voz cuando el modelo en uso puede transcribirlas (sección 10);</li>
+  <li>mensajes que el cliente y una persona del negocio se cruzan desde la aplicación de WhatsApp Business mientras esa persona atiende el chat, para que el asistente sepa qué pasó cuando retome. Solo se guardan si el cliente ya otorgó su autorización;</li>
+  <li>fotografías y notas de voz enviadas por WhatsApp: el archivo se descarga de Meta solo para procesarlo y no se guarda; se conserva únicamente una referencia técnica (el identificador que Meta le asigna y su tipo);</li>
   <li>citas solicitadas, creadas, canceladas o reagendadas: servicio, trabajador, fecha, hora, duración, precio y estado;</li>
   <li>citas recurrentes configuradas por el negocio;</li>
   <li>anticipos y pagos: monto, medio de pago y, cuando el cliente envía un comprobante, la fecha, el banco, el número de referencia y el valor leídos del comprobante;</li>
   <li>bonos de regalo comprados o recibidos: comprador, beneficiario, ocasión, dedicatoria, saldo y uso;</li>
   <li>fecha de última interacción;</li>
   <li>notas internas y etiquetas creadas por el negocio;</li>
+  <li>avisos al negocio relacionados con el cliente, con su nombre y el motivo del aviso;</li>
+  <li>quién atiende el chat en cada momento (el asistente o una persona del negocio) y hasta cuándo;</li>
   <li>identificadores técnicos de mensajes y metadatos necesarios para evitar duplicados, mantener la seguridad y diagnosticar errores.</li>
 </ul>
+<p>
+  Cuando una persona del negocio le escribe primero a alguien desde la
+  aplicación de WhatsApp Business, la plataforma crea un registro con el
+  número de teléfono o el identificador de usuario de esa persona, para
+  que el asistente no intervenga en una conversación que empezó el
+  negocio. El contenido de esos mensajes no se guarda mientras la persona
+  no haya otorgado su autorización.
+</p>
 <p>
   El nombre visible del perfil de WhatsApp se considera provisional y
   puede no corresponder al nombre real del titular. El asistente o el
@@ -152,16 +173,17 @@
 <h3>4.4. Datos derivados del uso de inteligencia artificial</h3>
 <p>Para generar respuestas y ejecutar las acciones solicitadas, el sistema procesa:</p>
 <ul>
-  <li>el mensaje actual del cliente, incluidas las fotografías y notas de voz que envíe;</li>
-  <li>los mensajes más recientes de la conversación;</li>
+  <li>el mensaje actual del cliente, incluidas las fotografías que envíe y, cuando el modelo en uso puede escucharlas, sus notas de voz (sección 10);</li>
+  <li>los mensajes más recientes de la conversación, incluidos los que una persona del negocio le escribió al cliente desde la aplicación de WhatsApp Business;</li>
   <li>el nombre del cliente, sus citas próximas y sus bonos vigentes;</li>
   <li>servicios, precios, horarios, trabajadores y políticas del negocio;</li>
   <li>resultados de las herramientas consultadas por el asistente;</li>
   <li>métricas técnicas de cada respuesta: modelo utilizado, herramientas invocadas, tiempo de respuesta, consumo y costo, asociadas al cliente pero sin el contenido de los mensajes.</li>
 </ul>
 <p>
-  El asistente no recibe el teléfono, el correo, la cédula ni la fecha de
-  nacimiento del cliente.
+  El asistente no recibe el teléfono, el identificador ni el nombre de
+  usuario de WhatsApp, el correo, la cédula ni la fecha de nacimiento del
+  cliente.
 </p>
 
 <h3>4.5. Visitantes de este sitio web</h3>
@@ -170,6 +192,33 @@
   de analítica ni de publicidad. Quien pide información o una demostración
   lo hace por WhatsApp; en ese caso se tratan su número, su nombre de
   perfil y los mensajes que envíe, únicamente para atender su solicitud.
+</p>
+
+<h3>4.6. Datos que Meta envía al conectar el WhatsApp de un negocio</h3>
+<p>
+  Cuando un negocio conecta su número a NuvelLab y sigue usando la
+  aplicación de WhatsApp Business en el celular, NuvelLab le pide a Meta,
+  por una sola vez al terminar la conexión, que sincronice <strong>los contactos</strong>
+  guardados en esa aplicación (nombre y número).
+</p>
+<p>
+  El motivo es poder seguir reconociendo a los clientes de siempre. Cuando
+  una persona activa un nombre de usuario de WhatsApp, Meta solo incluye
+  su número de teléfono en los mensajes si esa persona escribió al negocio
+  en los últimos treinta (30) días o si está en los contactos del negocio.
+  Por ejemplo, si una clienta que va al spa cada tres meses activa su
+  nombre de usuario, gracias a la sincronización Meta sigue enviando su
+  número y la plataforma la reconoce, en lugar de tratarla como una
+  persona nueva.
+</p>
+<p>
+  Meta envía esos contactos al servidor de NuvelLab, que no los guarda: los
+  descarta en el momento en que llegan, sin guardarlos en la base de
+  datos, sin enviarlos a modelos de inteligencia artificial y sin
+  registrar su contenido; solo queda registro técnico de que llegaron.
+  NuvelLab no solicita el historial de chats de la aplicación del negocio.
+  Si en el futuro NuvelLab llegara a usar esa información, actualizará esta política
+  antes de hacerlo.
 </p>
 
 <h2 id="datos-sensibles">5. Datos sensibles</h2>
@@ -194,8 +243,8 @@
   Las imágenes de los comprobantes de pago no se guardan en la base de
   datos de NuvelLab: de ellas solo se conservan la fecha, el banco, el
   número de referencia y el valor, que una persona del negocio verifica.
-  La imagen permanece en la conversación de WhatsApp durante el plazo
-  indicado en la sección 13.
+  La imagen permanece en el chat de la aplicación de WhatsApp Business
+  del negocio y en los servidores de Meta, según las condiciones de Meta.
 </p>
 
 <h2 id="menores">6. Datos de niños, niñas y adolescentes</h2>
@@ -218,7 +267,9 @@
   <li>directamente del titular;</li>
   <li>del negocio que utiliza NuvelLab;</li>
   <li>de los mensajes enviados por WhatsApp;</li>
-  <li>del perfil de WhatsApp que Meta entrega junto con cada mensaje;</li>
+  <li>del perfil y del identificador de usuario de WhatsApp que Meta entrega junto con cada mensaje;</li>
+  <li>de los mensajes que una persona del negocio envía desde la aplicación de WhatsApp Business, que Meta le reporta a NuvelLab;</li>
+  <li>de la sincronización de contactos que Meta ofrece al conectar el número del negocio (sección 4.6);</li>
   <li>de la actividad del usuario dentro del panel;</li>
   <li>de sistemas técnicos de seguridad y diagnóstico.</li>
 </ul>
@@ -226,18 +277,21 @@
 <h2 id="finalidades">8. Finalidades del tratamiento</h2>
 <p>Los datos se tratarán para:</p>
 <ol>
+  <li>Conectar la cuenta de WhatsApp Business del negocio con la plataforma y crear en ella las plantillas de mensaje que el servicio necesita.</li>
   <li>Identificar el negocio al que se dirige un mensaje.</li>
-  <li>Identificar o crear el registro del cliente por su número telefónico.</li>
+  <li>Identificar o crear el registro del cliente por su número telefónico o por su identificador de usuario de WhatsApp, y seguir reconociéndolo cuando activa un nombre de usuario.</li>
   <li>Solicitar, registrar y conservar evidencia de la autorización.</li>
   <li>Mantener el contexto de una conversación.</li>
   <li>Responder consultas sobre servicios, precios, disponibilidad, horarios y políticas.</li>
   <li>Crear, consultar, cancelar y reagendar citas.</li>
   <li>Apartar citas que requieren anticipo, recibir los comprobantes y permitir que una persona del negocio los verifique.</li>
   <li>Registrar pagos, anticipos, devoluciones y bonos de regalo en la caja del negocio.</li>
-  <li>Avisar al cliente sobre cambios en sus citas, cuando el negocio active esa función.</li>
+  <li>Avisar al cliente sobre cambios en sus citas, cuando el negocio active esa función, y sobre el resultado de la verificación de su pago.</li>
   <li>Permitir al negocio administrar clientes, servicios, trabajadores, horarios, ausencias y agenda.</li>
+  <li>Permitir al negocio unir dos fichas duplicadas de un mismo cliente (sección 13).</li>
   <li>Actualizar el nombre, el correo o la fecha de nacimiento del cliente cuando este lo solicite o confirme.</li>
-  <li>Pasar la conversación a una persona del negocio cuando el asistente no puede resolverla o el cliente lo pide.</li>
+  <li>Pasar la conversación a una persona del negocio cuando el asistente no puede resolverla o el cliente lo pide, y pausar el asistente en un chat cuando una persona del negocio responde desde la aplicación de WhatsApp Business.</li>
+  <li>Avisar al negocio, en el panel, cuando un chat necesita a una persona o hay un comprobante por verificar.</li>
   <li>Detectar y evitar mensajes duplicados, fraude, abuso y accesos no autorizados.</li>
   <li>Diagnosticar errores, controlar costos y mejorar la confiabilidad del servicio.</li>
   <li>Elaborar estadísticas para el negocio sobre sus propias citas, clientes e ingresos, y estadísticas agregadas y anónimas sobre el funcionamiento de la plataforma.</li>
@@ -246,7 +300,9 @@
 </ol>
 <p>Los datos no serán vendidos.</p>
 <p>
-  NuvelLab no envía mensajes promocionales ni campañas. Si un negocio
+  NuvelLab no envía mensajes promocionales ni campañas. Las plantillas de
+  WhatsApp que crea en la cuenta de cada negocio son de servicio, no de
+  publicidad (sección 11). Si un negocio
   quisiera usar los datos de sus clientes con fines comerciales —por
   ejemplo, felicitaciones de cumpleaños con ofertas—, necesitará una
   autorización separada. La autorización para gestionar citas no se
@@ -280,8 +336,9 @@
 <p>
   Antes de la autorización se guardan únicamente los datos indispensables
   para recibir el mensaje, identificar el negocio, responder con el aviso
-  y registrar la decisión del titular: el número de teléfono, el nombre
-  del perfil de WhatsApp y el mensaje recibido con sus adjuntos. Estos
+  y registrar la decisión del titular: el número de teléfono, el
+  identificador y, si Meta lo envía, el nombre de usuario de WhatsApp, el
+  nombre del perfil de WhatsApp y el mensaje recibido con la referencia técnica de sus adjuntos. Estos
   datos no se envían al modelo de inteligencia artificial, no se usan para
   marketing y el mensaje se elimina en el plazo indicado en la sección 13.
 </p>
@@ -306,10 +363,17 @@
 <h2 id="inteligencia-artificial">10. Uso de inteligencia artificial</h2>
 <p>
   NuvelLab utiliza modelos de inteligencia artificial de terceros para
-  comprender solicitudes en lenguaje natural, interpretar fotografías y
-  notas de voz, mantener conversaciones y seleccionar herramientas
-  autorizadas de la plataforma.
-  El proveedor principal es <strong>Google (Gemini)</strong>; <strong>Anthropic (Claude)</strong> puede usarse como alternativa.
+  comprender solicitudes en lenguaje natural, interpretar fotografías,
+  mantener conversaciones y seleccionar herramientas autorizadas de la
+  plataforma.
+  El proveedor principal es <strong>Anthropic (Claude)</strong>; <strong>Google (Gemini)</strong> puede usarse como alternativa. En cada momento se usa uno solo de los dos.
+</p>
+<p>
+  Las notas de voz dependen del modelo en uso. Claude no procesa audio:
+  mientras sea el modelo en uso, la nota de voz no se le envía ni se
+  transcribe; el asistente solo sabe que el cliente envió una nota de voz.
+  Cuando se usa Gemini, este escucha la nota de voz para responder y la
+  transcribe a texto para guardarla en la conversación.
 </p>
 <p>El asistente puede:</p>
 <ul>
@@ -317,7 +381,7 @@
   <li>crear, cancelar o reagendar citas, con confirmación del cliente;</li>
   <li>apartar una cita que requiere anticipo e indicar cómo pagarlo;</li>
   <li>recibir el comprobante de pago y leer sus datos para que una persona del negocio lo verifique;</li>
-  <li>transcribir notas de voz;</li>
+  <li>transcribir notas de voz, cuando el modelo en uso puede hacerlo;</li>
   <li>actualizar el nombre, el correo o la fecha de nacimiento que el cliente le indique;</li>
   <li>pasar la conversación a una persona del negocio;</li>
   <li>registrar una solicitud de eliminación de datos;</li>
@@ -343,6 +407,14 @@
   cualquier momento.
 </p>
 <p>
+  Cuando una persona del negocio responde un chat desde la aplicación de
+  WhatsApp Business, el asistente deja de responder en ese chat y lo
+  retoma solo después de dos (2) horas sin mensajes de esa persona. Lo
+  mismo ocurre cuando el asistente pasa el chat a una persona. Desde el
+  panel, el negocio también puede tomar un chat o devolvérselo al
+  asistente.
+</p>
+<p>
   La información enviada a los modelos se limita a lo necesario para
   generar la respuesta y ejecutar la solicitud (sección 4.4). NuvelLab
   procurará configurar los servicios contratados para que los proveedores
@@ -354,18 +426,36 @@
 <p>NuvelLab utiliza los siguientes proveedores tecnológicos para prestar el servicio:</p>
 <ul>
   <li><strong>Supabase (servidores de Amazon Web Services en Estados Unidos):</strong> base de datos de la plataforma.</li>
-  <li><strong>Hostinger (servidor privado en Estados Unidos):</strong> alojamiento del servidor de la plataforma y de la bandeja de conversaciones de WhatsApp.</li>
+  <li><strong>Hostinger (servidor privado en Estados Unidos):</strong> alojamiento del servidor de la plataforma.</li>
   <li><strong>Vercel:</strong> alojamiento de este sitio web y del panel.</li>
-  <li><strong>Google (Gemini):</strong> modelo de inteligencia artificial principal, incluida la interpretación de fotografías y la transcripción de notas de voz.</li>
-  <li><strong>Anthropic (Claude):</strong> modelo de inteligencia artificial alternativo.</li>
-  <li><strong>Meta (WhatsApp Business Platform):</strong> recepción y envío de mensajes de WhatsApp.</li>
+  <li><strong>Anthropic (Claude):</strong> modelo de inteligencia artificial principal, incluida la interpretación de fotografías.</li>
+  <li><strong>Google (Gemini):</strong> modelo de inteligencia artificial alternativo; cuando se usa, también escucha y transcribe las notas de voz.</li>
+  <li><strong>Meta (WhatsApp Business Platform):</strong> recepción y envío de los mensajes de WhatsApp, conexión de la cuenta de WhatsApp Business de cada negocio y plantillas de mensaje.</li>
   <li><strong>Resend:</strong> envío de correos de la plataforma, como invitaciones y cambios de contraseña, a los usuarios del panel.</li>
 </ul>
 <p>
-  La bandeja de conversaciones de WhatsApp funciona con Chatwoot, un
-  software de código abierto que NuvelLab instala en su propio servidor:
-  las conversaciones no se comparten con la empresa que desarrolla
-  Chatwoot.
+  Cada negocio tiene su propia cuenta de WhatsApp Business con Meta y
+  acepta directamente las condiciones de Meta. NuvelLab, como proveedor de
+  tecnología autorizado por Meta, se conecta a esa cuenta con el permiso
+  que el negocio le otorga al conectarla desde el panel, y se comunica
+  directamente con Meta para recibir y enviar los mensajes del asistente.
+  El negocio sigue viendo y respondiendo sus chats en su aplicación de
+  WhatsApp Business; esa aplicación y lo que guarda se rigen por las
+  condiciones de Meta y no por esta política.
+</p>
+<p>
+  Con ese permiso, NuvelLab crea en la cuenta de WhatsApp de cada negocio
+  las plantillas de mensaje que el servicio necesita: la confirmación o el
+  rechazo de un pago y los avisos de cambios en una cita. Cuando han
+  pasado más de 24 horas desde el último mensaje de un cliente, WhatsApp
+  solo permite escribirle con una plantilla aprobada por Meta. Por eso los
+  avisos de cambios de cita salen siempre como plantilla, y la
+  confirmación o el rechazo de un pago salen como plantilla cuando ya
+  pasaron esas 24 horas. Todas salen a nombre del negocio y desde su
+  número, y le llegan al cliente a su número de teléfono o, si la
+  plataforma no lo tiene, a su identificador de usuario de WhatsApp.
+  Por ejemplo: <em>“Hola Laura, recibimos tu pago y tu cita en Spa
+  Prueba del jueves 22 de octubre a las 3:00 pm quedó confirmada”</em>.
 </p>
 <p>
   Estos proveedores tratan datos únicamente para prestar los servicios
@@ -400,7 +490,9 @@
   <li>separación de la información por negocio en la plataforma y en la base de datos;</li>
   <li>cifrado en tránsito mediante HTTPS;</li>
   <li>almacenamiento restringido de credenciales y secretos;</li>
-  <li>verificación de firma de los mensajes que llegan de la bandeja de WhatsApp;</li>
+  <li>cifrado de la credencial de acceso a la cuenta de WhatsApp de cada negocio;</li>
+  <li>verificación de la firma de Meta en cada mensaje que llega de WhatsApp: lo que no viene firmado por Meta se rechaza sin leerse;</li>
+  <li>identificación del negocio al que va cada mensaje por el número de WhatsApp que lo recibe, nunca por lo que escribe el cliente;</li>
   <li>límites de uso para prevenir abusos;</li>
   <li>validación de datos de entrada;</li>
   <li>registro de errores sin incluir el contenido de los mensajes;</li>
@@ -435,14 +527,17 @@
   legales aplicables. Estos son los plazos que aplica la plataforma:
 </p>
 <ul>
-  <li><strong>Conversaciones con el asistente</strong>, incluidas fotografías, notas de voz y transcripciones: se eliminan cuando el cliente lleva <strong>noventa (90) días</strong> sin escribir.</li>
+  <li><strong>Conversaciones con el asistente</strong>, incluidas las transcripciones de notas de voz y los mensajes cruzados con una persona del negocio: se eliminan cuando el cliente lleva <strong>noventa (90) días</strong> sin escribir. Las fotografías y notas de voz no se guardan.</li>
   <li><strong>Mensajes recibidos pendientes de procesar</strong>, incluidos los que llegan antes de la autorización: se eliminan a los <strong>treinta (30) días</strong>.</li>
   <li><strong>Métricas técnicas del asistente:</strong> se eliminan a los <strong>ciento ochenta (180) días</strong>.</li>
   <li><strong>Sesiones y enlaces de acceso</strong> vencidos o usados: se eliminan a los <strong>siete (7) días</strong>.</li>
-  <li><strong>Clientes eliminados</strong>, por solicitud propia o del negocio: el registro queda desactivado durante <strong>noventa (90) días</strong>, en los que el negocio puede restaurarlo si la eliminación fue un error. Al terminar ese plazo se borran su nombre, teléfono, correo, cédula, fecha de nacimiento, notas, etiquetas, conversaciones, los datos leídos de sus comprobantes y los datos personales de sus bonos.</li>
+  <li><strong>Clientes eliminados</strong>, por solicitud propia o del negocio: el registro queda desactivado durante <strong>noventa (90) días</strong>, en los que el negocio puede restaurarlo si la eliminación fue un error. Al terminar ese plazo se borran su nombre, teléfono, identificador y nombre de usuario de WhatsApp, correo, cédula, fecha de nacimiento, notas, etiquetas, conversaciones, los datos leídos de sus comprobantes y los datos personales de sus bonos.</li>
   <li><strong>Citas, pagos y movimientos de caja</strong> de un cliente eliminado se conservan asociados a un “Cliente eliminado”, sin datos que lo identifiquen, porque forman parte de la contabilidad del negocio.</li>
+  <li><strong>Fichas duplicadas que el negocio une:</strong> las citas, los pagos, la conversación y demás información de las dos fichas pasan a una sola, y la ficha duplicada se elimina.</li>
+  <li><strong>Avisos del panel:</strong> se eliminan a los <strong>noventa (90) días</strong>.</li>
   <li><strong>Evidencia de la autorización:</strong> se conserva mientras puedan surgir obligaciones o reclamaciones relacionadas con el tratamiento.</li>
-  <li><strong>Copias de seguridad:</strong> la información puede permanecer en ellas hasta cumplir el ciclo de rotación del proveedor, que en la bandeja de conversaciones es de siete (7) días.</li>
+  <li><strong>Copias de seguridad:</strong> la información puede permanecer en ellas hasta cumplir el ciclo de rotación del proveedor.</li>
+  <li><strong>Chats en la aplicación de WhatsApp Business del negocio:</strong> no los guarda ni los controla NuvelLab. Permanecen en los dispositivos del negocio y en los servidores de Meta según las condiciones de Meta, y borrarlos le corresponde al negocio.</li>
   <li><strong>Datos de un negocio que deja de usar NuvelLab:</strong> el negocio puede descargar su información desde el panel; después, NuvelLab la elimina de sus sistemas activos cuando el negocio lo solicite o según lo acordado en su contrato.</li>
   <li><strong>Información contable, contractual o de seguridad:</strong> se conserva durante los plazos legales correspondientes.</li>
 </ul>
@@ -473,7 +568,7 @@
 <h2 id="procedimiento">15. Canales y procedimiento para ejercer derechos</h2>
 <h3>15.1. Clientes de un negocio</h3>
 <ul>
-  <li><strong>Eliminar sus datos:</strong> escribiendo <strong>“eliminar mis datos”</strong> en el WhatsApp del negocio y confirmando la solicitud. Las citas futuras se cancelan; si había un anticipo pagado, su devolución depende de la política del negocio.</li>
+  <li><strong>Eliminar sus datos:</strong> escribiendo <strong>“eliminar mis datos”</strong> en el WhatsApp del negocio y confirmando la solicitud. Las citas futuras se cancelan; si había un anticipo pagado, su devolución depende de la política del negocio. Esto elimina lo que guarda NuvelLab; el chat que el negocio conserva en su aplicación de WhatsApp Business debe borrarlo el negocio.</li>
   <li><strong>Conocer, corregir o recibir una copia de sus datos:</strong> ante el negocio con el que mantiene la relación, que puede consultarlos, corregirlos y descargarlos desde el panel.</li>
   <li><strong>Por correo:</strong> escribiendo a <strong>nuvellaboficial@gmail.com</strong> e indicando el nombre del negocio. NuvelLab trasladará o coordinará la solicitud con el negocio.</li>
 </ul>
@@ -527,6 +622,21 @@
   <li>preferencias de visualización, como el tema claro u oscuro o la vista de la agenda.</li>
 </ul>
 <p>
+  Si el usuario lo permite en su navegador, el panel también muestra
+  notificaciones del navegador con los avisos del negocio.
+</p>
+<p>
+  <strong>Conexión del WhatsApp del negocio:</strong> cuando el
+  propietario conecta su número desde Configuración → WhatsApp, el panel
+  carga en ese momento el SDK de JavaScript de Facebook
+  (<strong>connect.facebook.net</strong>) y abre una ventana de Meta para
+  iniciar sesión y autorizar la conexión. Ese SDK no se carga en ninguna
+  otra parte del panel ni en este sitio web, y solo lo usan los
+  propietarios de los negocios en ese paso. Mientras se usa, Meta puede
+  instalar sus propias cookies y recibir datos técnicos del navegador,
+  según sus propias políticas.
+</p>
+<p>
   NuvelLab no utiliza cookies publicitarias. Si en el futuro se incorporan
   herramientas analíticas o publicitarias no esenciales, se informará al
   usuario y se solicitará el consentimiento correspondiente cuando sea
@@ -536,7 +646,8 @@
 <h2 id="terceros">17. Enlaces y servicios de terceros</h2>
 <p>
   Este sitio y la plataforma contienen enlaces a servicios de terceros,
-  como WhatsApp. Al usarlos, las prácticas de esos terceros se rigen por
+  como WhatsApp, y el panel abre la ventana de Meta para conectar el
+  WhatsApp del negocio. Al usarlos, las prácticas de esos terceros se rigen por
   sus propias políticas. NuvelLab selecciona proveedores razonables, pero
   no controla las finalidades independientes que un tercero pueda realizar
   fuera de la prestación contratada.
@@ -557,7 +668,7 @@
 <h2 id="vigencia">19. Vigencia</h2>
 <p>
   La primera versión de esta política entró en vigor el 10 de julio de
-  2026. Esta versión 1.1 rige desde el 24 de septiembre de 2026 y
+  2026. Esta versión 1.2 rige desde el {V1_2_EFFECTIVE_DATE} y
   permanecerá vigente mientras NuvelLab realice tratamiento de datos
   personales.
 </p>
