@@ -297,7 +297,7 @@ export const CLIENT_HISTORY = [
 ] as const;
 
 export const TRUST = [
-  'API oficial de WhatsApp Business',
+  'Tech Provider aprobado por Meta, con la API oficial de WhatsApp Business',
   'Tus datos protegidos según la Ley 1581 de Colombia',
   'Cada negocio con sus datos aislados',
 ] as const;
@@ -314,5 +314,6 @@ export const FAQ = [
   ['¿Funciona si tengo varios trabajadores?', 'Sí. Cada trabajador tiene su propia agenda y el bot solo ofrece los horarios en que está libre.'],
   ['¿Dónde quedan mis datos y los de mis clientes?', 'Protegidos según la Ley 1581, y los de tu negocio nunca se mezclan con los de otro.'],
   ['¿Tengo que cambiar mi número de WhatsApp?', 'No. El bot contesta desde el mismo número que tus clientes ya conocen.'],
+  ['¿Me pueden bloquear el número?', 'NuvelLab es Tech Provider aprobado por Meta: tu número se conecta a la API oficial de WhatsApp, no a una app no autorizada. Los bloqueos suelen venir de esas apps o de enviar mensajes masivos, y NuvelLab no envía mensajes masivos.'],
   ['¿Cuánto tarda en estar listo?', 'Entre 2 y 3 días, mientras conectamos tu número a la API oficial de WhatsApp.'],
 ] as const;
