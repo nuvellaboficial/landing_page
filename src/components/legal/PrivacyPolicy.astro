@@ -1,23 +1,27 @@
 ---
 /**
- * Política de Tratamiento de Datos Personales y Privacidad (v1.2).
+ * Política de Tratamiento de Datos Personales y Privacidad (v1.3).
  * v1.0 (10 jul 2026) was written for the n8n/Railway architecture; v1.1 aligned it
  * with what the platform actually stores and the providers it actually uses;
  * v1.2 covers NuvelLab as a Meta Tech Provider (each business connects its own
  * WhatsApp with Embedded Signup and coexistence, no Chatwoot) and Anthropic as
  * the main AI provider. It must go live together with the Tech Provider release.
+ * v1.3 updates the providers (Cloudflare in, panel moved from Vercel to
+ * Hostinger) and the technical information in §16. It must be live before the
+ * backend with `PRIVACY_POLICY.version` 1.3, and before Cloudflare proxies
+ * production.
  * This file is the only copy of the policy. Legal text: do not edit without the
  * owner's review, and bump the version and dates on every change.
  */
 
-// Tech Provider production release date. Used in the header and in §19.
-const V1_2_EFFECTIVE_DATE = '21 de octubre de 2026';
+// Publication date of v1.3. Used in the header and in §19.
+const V1_3_EFFECTIVE_DATE = '25 de noviembre de 2026';
 ---
 
 <p>
-  <strong>Versión:</strong> 1.2<br />
+  <strong>Versión:</strong> 1.3<br />
   <strong>Fecha de entrada en vigencia de la primera versión:</strong> 10 de julio de 2026<br />
-  <strong>Última actualización:</strong> {V1_2_EFFECTIVE_DATE}
+  <strong>Última actualización:</strong> {V1_3_EFFECTIVE_DATE}
 </p>
 
 <h2 id="identificacion">1. Identificación del responsable</h2>
@@ -426,8 +430,9 @@ const V1_2_EFFECTIVE_DATE = '21 de octubre de 2026';
 <p>NuvelLab utiliza los siguientes proveedores tecnológicos para prestar el servicio:</p>
 <ul>
   <li><strong>Supabase (servidores de Amazon Web Services en Estados Unidos):</strong> base de datos de la plataforma.</li>
-  <li><strong>Hostinger (servidor privado en Estados Unidos):</strong> alojamiento del servidor de la plataforma.</li>
-  <li><strong>Vercel:</strong> alojamiento de este sitio web y del panel.</li>
+  <li><strong>Hostinger (servidor privado en Estados Unidos):</strong> alojamiento del servidor de la plataforma y del panel.</li>
+  <li><strong>Vercel:</strong> alojamiento de este sitio web.</li>
+  <li><strong>Cloudflare:</strong> red por la que pasan las conexiones al panel y a la plataforma, incluidos los datos que viajan en ellas y la dirección IP de quien se conecta, para protegerlas de ataques y hacerlas llegar al servidor. No se le pide guardar el contenido de esas comunicaciones.</li>
   <li><strong>Anthropic (Claude):</strong> modelo de inteligencia artificial principal, incluida la interpretación de fotografías.</li>
   <li><strong>Google (Gemini):</strong> modelo de inteligencia artificial alternativo; cuando se usa, también escucha y transcribe las notas de voz.</li>
   <li><strong>Meta (WhatsApp Business Platform):</strong> recepción y envío de los mensajes de WhatsApp, conexión de la cuenta de WhatsApp Business de cada negocio y plantillas de mensaje.</li>
@@ -622,6 +627,12 @@ const V1_2_EFFECTIVE_DATE = '21 de octubre de 2026';
   <li>preferencias de visualización, como el tema claro u oscuro o la vista de la agenda.</li>
 </ul>
 <p>
+  Cloudflare, la red por la que pasan las conexiones al panel, puede
+  instalar una cookie técnica de seguridad si necesita comprobar que una
+  conexión no es un ataque, y recibir del navegador avisos de errores de
+  conexión.
+</p>
+<p>
   Si el usuario lo permite en su navegador, el panel también muestra
   notificaciones del navegador con los avisos del negocio.
 </p>
@@ -668,7 +679,9 @@ const V1_2_EFFECTIVE_DATE = '21 de octubre de 2026';
 <h2 id="vigencia">19. Vigencia</h2>
 <p>
   La primera versión de esta política entró en vigor el 10 de julio de
-  2026. Esta versión 1.2 rige desde el {V1_2_EFFECTIVE_DATE} y
+  2026. Esta versión 1.3 rige desde el {V1_3_EFFECTIVE_DATE} y
   permanecerá vigente mientras NuvelLab realice tratamiento de datos
-  personales.
+  personales. Frente a la versión 1.2, del 21 de octubre de 2026,
+  actualiza la lista de proveedores (sección 11) y la información técnica
+  de la sección 16, sin cambiar las finalidades del tratamiento.
 </p>
